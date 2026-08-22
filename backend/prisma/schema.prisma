@@ -89,28 +89,29 @@ model User {
 }
 
 model Employee {
-  id            String         @id @default(uuid())
-  userId        String         @unique @map("user_id")
-  companyId     String         @map("company_id")
-  firstName     String         @map("first_name")
-  lastName      String         @map("last_name")
-  phone         String?
-  personalEmail String?        @map("personal_email")
-  address       String?
-  dateOfBirth   DateTime?      @map("date_of_birth") @db.Date
-  gender        String?
-  maritalStatus String?        @map("marital_status")
-  nationality   String?
-  bankAccountNo String?        @map("bank_account_no")
-  bankName      String?        @map("bank_name")
-  ifscCode      String?        @map("ifsc_code")
-  pan           String?
-  uan           String?
-  departmentId  String?        @map("department_id")
-  jobPositionId String?        @map("job_position_id")
-  managerId     String?        @map("manager_id")
-  status        EmployeeStatus @default(ACTIVE)
-  joinDate      DateTime       @map("join_date") @db.Date
+  id                String         @id @default(uuid())
+  userId            String         @unique @map("user_id")
+  companyId         String         @map("company_id")
+  firstName         String         @map("first_name")
+  lastName          String         @map("last_name")
+  phone             String?
+  personalEmail     String?        @map("personal_email")
+  address           String?
+  dateOfBirth       DateTime?      @map("date_of_birth") @db.Date
+  gender            String?
+  maritalStatus     String?        @map("marital_status")
+  nationality       String?
+  bankAccountNo     String?        @map("bank_account_no")
+  bankName          String?        @map("bank_name")
+  ifscCode          String?        @map("ifsc_code")
+  pan               String?
+  uan               String?
+  profilePictureUrl String?        @map("profile_picture_url")
+  departmentId      String?        @map("department_id")
+  jobPositionId     String?        @map("job_position_id")
+  managerId         String?        @map("manager_id")
+  status            EmployeeStatus @default(ACTIVE)
+  joinDate          DateTime       @map("join_date") @db.Date
 
   user               User                          @relation(fields: [userId], references: [id])
   company            Company                       @relation(fields: [companyId], references: [id])

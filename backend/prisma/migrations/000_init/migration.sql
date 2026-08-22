@@ -66,6 +66,7 @@ CREATE TABLE "employees" (
     "ifsc_code" TEXT,
     "pan" TEXT,
     "uan" TEXT,
+    "profile_picture_url" TEXT,
     "department_id" TEXT,
     "job_position_id" TEXT,
     "manager_id" TEXT,
