@@ -1,0 +1,29 @@
+.leave-available {
+  font-size: 15px;
+}
+
+.leave-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.leave-cancel {
+  border: 1px solid var(--df-border);
+  background: transparent;
+  color: var(--df-danger);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.leave-cancel:hover:not(:disabled) {
+  border-color: var(--df-danger);
+}
+
+.leave-cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -1,0 +1,82 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--df-text-muted);
+}
+
+.state--card {
+  background: var(--df-surface);
+  border: 1px dashed var(--df-border);
+  border-radius: var(--df-radius);
+}
+
+.state--inline {
+  flex-direction: row;
+  padding: 8px 0;
+}
+
+.state__spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--df-primary-soft);
+  border-top-color: var(--df-primary);
+  border-radius: 50%;
+  animation: state-spin 0.7s linear infinite;
+}
+
+@keyframes state-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.state--inline .state__label {
+  margin: 0;
+}
+
+.state__label {
+  margin: 0;
+  font-size: 14px;
+}
+
+.state__icon {
+  width: 36px;
+  height: 36px;
+  color: #98a2b3;
+}
+
+.state__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--df-text);
+}
+
+.state--error .state__title {
+  color: var(--df-danger);
+}
+
+.state__message {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 14px;
+}
+
+.btn {
+  display: inline-block;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 16px;
+  background: var(--df-primary);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--df-primary-strong);
+}
