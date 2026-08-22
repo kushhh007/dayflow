@@ -28,6 +28,16 @@ const store = {
   payslips: [],
 }
 
+const inFlightRuns = new Set()
+
+function lockRun(runId) {
+  if (inFlightRuns.has(runId)) {
+    throw new Error('A payroll operation is already in progress for this run.')
+  }
+  inFlightRuns.add(runId)
+  return () => inFlightRuns.delete(runId)
+}
+
 function computeProvisionalPayslip(run) {
   // Simulated backend calculation — real values arrive from the API contract.
   const start = new Date(`${run.periodStart}T00:00:00`)
@@ -118,18 +128,24 @@ export async function calculatePayrollRun(runId) {
   if (!run) {
     throw new Error('Payroll run not found.')
   }
-  if (run.status === 'FINALIZED') {
-    throw new Error('Finalized runs cannot be recalculated.')
-  }
+  const release = lockRun(runId)
+  try {
+    if (!['DRAFT', 'CALCULATED'].includes(run.status)) {
+      throw new Error('Only draft or calculated runs can be calculated.')
+    }
 
-  run.status = 'CALCULATED'
-  store.payslips = [
-    ...store.payslips.filter(
-      (payslip) => !(payslip.runId === run.id && payslip.status !== 'FINALIZED'),
-    ),
-    computeProvisionalPayslip(run),
-  ]
-  return mockResponse({ ...run })
+    run.status = 'CALCULATED'
+    store.payslips = [
+      ...store.payslips.filter(
+        (payslip) => !(payslip.runId === run.id && payslip.status !== 'FINALIZED'),
+      ),
+      computeProvisionalPayslip(run),
+    ]
+    const response = await mockResponse({ ...run })
+    return response
+  } finally {
+    release()
+  }
 }
 
 export async function finalizePayrollRun(runId) {
@@ -140,22 +156,28 @@ export async function finalizePayrollRun(runId) {
   if (!run || run.status !== 'CALCULATED') {
     throw new Error('Only calculated runs can be finalized.')
   }
-  const overlap = store.runs.some(
-    (other) =>
-      other.id !== run.id &&
-      other.status === 'FINALIZED' &&
-      other.periodStart <= run.periodEnd &&
-      run.periodStart <= other.periodEnd,
-  )
-  if (overlap) {
-    throw new Error('Period overlaps an already finalized payroll run.')
-  }
+  const release = lockRun(runId)
+  try {
+    const overlap = store.runs.some(
+      (other) =>
+        other.id !== run.id &&
+        other.status === 'FINALIZED' &&
+        other.periodStart <= run.periodEnd &&
+        run.periodStart <= other.periodEnd,
+    )
+    if (overlap) {
+      throw new Error('Period overlaps an already finalized payroll run.')
+    }
 
-  run.status = 'FINALIZED'
-  store.payslips.forEach((payslip) => {
-    if (payslip.runId === run.id) payslip.status = 'FINALIZED'
-  })
-  return mockResponse({ ...run })
+    run.status = 'FINALIZED'
+    store.payslips.forEach((payslip) => {
+      if (payslip.runId === run.id) payslip.status = 'FINALIZED'
+    })
+    const response = await mockResponse({ ...run })
+    return response
+  } finally {
+    release()
+  }
 }
 
 export async function listPayslips() {

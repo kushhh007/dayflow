@@ -1,5 +1,6 @@
 import { ROLES } from '../constants/roles.js'
 import { mockResponse } from './mock.js'
+import { getEmployee } from './employeeService.js'
 
 // MOCK SERVICE. Contract areas below follow the Dayflow v4.5 spec; endpoint
 // paths will be defined in docs/api.md by the backend lead and must not be
@@ -91,6 +92,11 @@ export async function login({ loginId, password }) {
 
   if (effectiveUser.password !== password) {
     throw new Error('Invalid login ID or password.')
+  }
+
+  const employee = await getEmployee(effectiveUser.id)
+  if (employee.status !== 'ACTIVE') {
+    throw new Error('This employee is inactive and cannot log in.')
   }
 
   return mockResponse(toSessionUser(effectiveUser))

@@ -13,6 +13,7 @@ const STATUS_TONE = {
   REJECTED: 'danger',
   LEAVE: 'info',
   DRAFT: 'info',
+  INACTIVE: 'muted',
   CANCELLED: 'muted',
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
 import StatusBadge from '../../components/ui/StatusBadge.jsx'
@@ -47,6 +47,8 @@ export default function PayrollPage() {
   const [busyId, setBusyId] = useState(null)
   const [busyAction, setBusyAction] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const createLockRef = useRef(false)
+  const actionLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -62,10 +64,11 @@ export default function PayrollPage() {
 
   async function handleCreate(event) {
     event.preventDefault()
-    if (creating || !month) {
+    if (createLockRef.current || creating || !month) {
       if (!month) setCreateError('Select a payroll period.')
       return
     }
+    createLockRef.current = true
     setCreating(true)
     setCreateError(null)
     try {
@@ -78,11 +81,13 @@ export default function PayrollPage() {
       setCreateError(err.message || 'Could not create the payroll run.')
     } finally {
       setCreating(false)
+      createLockRef.current = false
     }
   }
 
   async function handleAction(runId, action) {
-    if (busyId) return
+    if (actionLockRef.current || busyId) return
+    actionLockRef.current = true
     setBusyId(runId)
     setBusyAction(action)
     setActionError(null)
@@ -95,6 +100,7 @@ export default function PayrollPage() {
     } finally {
       setBusyId(null)
       setBusyAction(null)
+      actionLockRef.current = false
     }
   }
 
@@ -175,7 +181,7 @@ export default function PayrollPage() {
                       </div>
                       <div className="payroll-run__actions">
                         <StatusBadge status={run.status} />
-                        {run.status !== 'FINALIZED' && (
+                        {(run.status === 'DRAFT' || run.status === 'CALCULATED') && (
                           <button
                             type="button"
                             className="leave-cancel"
@@ -189,19 +195,21 @@ export default function PayrollPage() {
                                 : 'Recalculate'}
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className="btn"
-                          disabled={Boolean(busyId) || run.status !== 'CALCULATED'}
-                          title={
-                            run.status === 'DRAFT'
-                              ? 'Calculate the run before finalizing.'
-                              : undefined
-                          }
-                          onClick={() => handleAction(run.id, 'finalize')}
-                        >
-                          {busy && busyAction === 'finalize' ? 'Finalizing…' : 'Finalize'}
-                        </button>
+                        {(run.status === 'DRAFT' || run.status === 'CALCULATED') && (
+                          <button
+                            type="button"
+                            className="btn"
+                            disabled={Boolean(busyId) || run.status !== 'CALCULATED'}
+                            title={
+                              run.status === 'DRAFT'
+                                ? 'Calculate the run before finalizing.'
+                                : undefined
+                            }
+                            onClick={() => handleAction(run.id, 'finalize')}
+                          >
+                            {busy && busyAction === 'finalize' ? 'Finalizing…' : 'Finalize'}
+                          </button>
+                        )}
                       </div>
                     </li>
                   )
@@ -225,7 +233,9 @@ export default function PayrollPage() {
                       <p className="att-row__title">
                         {payslip.employeeName} · {payslip.periodLabel}
                       </p>
-                      <p className="att-row__meta">Net ₹{payslip.net.toLocaleString('en-IN')}</p>
+                        <p className="att-row__meta">
+                          Net ₹{payslip.net == null ? '—' : Number(payslip.net).toLocaleString('en-IN')}
+                        </p>
                     </div>
                     <StatusBadge status={payslip.status} />
                   </li>
@@ -238,4 +248,3 @@ export default function PayrollPage() {
     </section>
   )
 }
-
