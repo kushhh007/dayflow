@@ -20,7 +20,7 @@ CREATE TYPE "PayrollRunStatus" AS ENUM ('DRAFT', 'CALCULATED', 'FINALIZED');
 CREATE TYPE "LeaveTypeCode" AS ENUM ('PAID', 'SICK', 'UNPAID');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('LEAVE_APPROVED', 'LEAVE_REJECTED', 'ATTENDANCE_ANOMALY', 'PAYROLL_READY');
+CREATE TYPE "NotificationType" AS ENUM ('LEAVE_APPROVED', 'LEAVE_REJECTED', 'ATTENDANCE_CORRECTION', 'ATTENDANCE_ANOMALY', 'PAYROLL_READY');
 
 -- CreateTable
 CREATE TABLE "companies" (
@@ -125,6 +125,7 @@ CREATE TABLE "attendance_correction_requests" (
     "employee_id" TEXT NOT NULL,
     "attendance_id" TEXT,
     "work_date" DATE NOT NULL,
+    "corrected_status" "AttendanceStatus" NOT NULL,
     "requested_check_in" TIMESTAMP(3),
     "requested_check_out" TIMESTAMP(3),
     "reason" TEXT NOT NULL,

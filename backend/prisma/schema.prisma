@@ -46,6 +46,7 @@ enum LeaveTypeCode {
 enum NotificationType {
   LEAVE_APPROVED
   LEAVE_REJECTED
+  ATTENDANCE_CORRECTION
   ATTENDANCE_ANOMALY
   PAYROLL_READY
 }
@@ -188,17 +189,18 @@ model Attendance {
 }
 
 model AttendanceCorrectionRequest {
-  id                String        @id @default(uuid())
-  employeeId        String        @map("employee_id")
-  attendanceId      String?       @map("attendance_id")
-  workDate          DateTime      @map("work_date") @db.Date
-  requestedCheckIn  DateTime?     @map("requested_check_in")
-  requestedCheckOut DateTime?     @map("requested_check_out")
+  id                String           @id @default(uuid())
+  employeeId        String           @map("employee_id")
+  attendanceId      String?          @map("attendance_id")
+  workDate          DateTime         @map("work_date") @db.Date
+  correctedStatus   AttendanceStatus @map("corrected_status")
+  requestedCheckIn  DateTime?        @map("requested_check_in")
+  requestedCheckOut DateTime?        @map("requested_check_out")
   reason            String
-  status            RequestStatus @default(PENDING)
-  reviewedById      String?       @map("reviewed_by_id")
-  reviewedAt        DateTime?     @map("reviewed_at")
-  createdAt         DateTime      @default(now()) @map("created_at")
+  status            RequestStatus    @default(PENDING)
+  reviewedById      String?          @map("reviewed_by_id")
+  reviewedAt        DateTime?        @map("reviewed_at")
+  createdAt         DateTime         @default(now()) @map("created_at")
 
   employee   Employee    @relation(fields: [employeeId], references: [id])
   attendance Attendance? @relation(fields: [attendanceId], references: [id])
