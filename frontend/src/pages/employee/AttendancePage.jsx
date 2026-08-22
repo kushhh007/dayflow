@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
 import StatusBadge from '../../components/ui/StatusBadge.jsx'
@@ -33,6 +33,10 @@ function formatTimes(record) {
   return `${record.checkIn ?? '—'} – ${record.checkOut ?? '—'}`
 }
 
+function formatDayLabel(record) {
+  return record.day || formatDay(record.date)
+}
+
 function localIsoDate(date = new Date()) {
   const offset = date.getTimezoneOffset()
   return new Date(date.getTime() - offset * 60 * 1000).toISOString().slice(0, 10)
@@ -56,12 +60,14 @@ export default function AttendancePage() {
   // Today panel actions
   const [actionBusy, setActionBusy] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const actionLockRef = useRef(false)
 
   // Correction form state
   const [form, setForm] = useState({ date: '', checkIn: '', checkOut: '', reason: '' })
   const [formError, setFormError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(null)
+  const submitLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -90,7 +96,8 @@ export default function AttendancePage() {
   const weekendBlocked = todayIsWeekend && !devWeekendMode
 
   async function handleCheck(kind) {
-    if (actionBusy) return
+    if (actionLockRef.current || actionBusy) return
+    actionLockRef.current = true
     setActionBusy(kind)
     setActionError(null)
     try {
@@ -101,6 +108,7 @@ export default function AttendancePage() {
       setActionError(err.message || 'Action failed.')
     } finally {
       setActionBusy(null)
+      actionLockRef.current = false
     }
   }
 
@@ -125,12 +133,13 @@ export default function AttendancePage() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (submitting) return
+    if (submitLockRef.current || submitting) return
     const validationError = validateCorrection()
     if (validationError) {
       setFormError(validationError)
       return
     }
+    submitLockRef.current = true
     setSubmitting(true)
     setFormError(null)
     try {
@@ -147,6 +156,7 @@ export default function AttendancePage() {
       setFormError(err.message || 'Could not submit the correction request.')
     } finally {
       setSubmitting(false)
+      submitLockRef.current = false
     }
   }
 
@@ -170,8 +180,11 @@ export default function AttendancePage() {
             <div className="att-today">
               {todayRecord ? (
                 <>
-                  <StatusBadge status={todayRecord.status} />
-                  <p className="att-today__times">{formatTimes(todayRecord)}</p>
+                   <StatusBadge status={todayRecord.status} />
+                   <p className="att-today__times">{formatTimes(todayRecord)}</p>
+                   <p className="att-row__meta">
+                     Work hours {todayRecord.workHours ?? '—'} · Extra hours {todayRecord.extraHours ?? '—'}
+                   </p>
                 </>
               ) : (
                 <EmptyState title="Not checked in yet" message="No attendance recorded for today." />
@@ -232,8 +245,11 @@ export default function AttendancePage() {
               {records.map((record) => (
                 <li key={record.id} className="att-row">
                   <div>
-                    <p className="att-row__title">{formatDay(record.date)}</p>
-                    <p className="att-row__meta">{formatTimes(record)}</p>
+                     <p className="att-row__title">{formatDayLabel(record)} · {formatDay(record.date)}</p>
+                     <p className="att-row__meta">{formatTimes(record)}</p>
+                     <p className="att-row__meta">
+                       Work hours {record.workHours ?? '—'} · Extra hours {record.extraHours ?? '—'}
+                     </p>
                     {record.devWeekendTest && (
                       <p className="att-row__flag att-devtag">Dev test entry (weekend)</p>
                     )}

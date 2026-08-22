@@ -49,6 +49,12 @@ function nowHHMM() {
   return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 }
 
+function dayLabel(dateString) {
+  return new Intl.DateTimeFormat('en-IN', { weekday: 'short' }).format(
+    new Date(`${dateString}T00:00:00`),
+  )
+}
+
 // Recent Monday–Friday dates strictly before today (attendance is a
 // working-days-only concept; today starts with no record until check-in).
 function previousWorkingDates(count) {
@@ -65,10 +71,34 @@ function previousWorkingDates(count) {
 }
 
 const HISTORY_TEMPLATE = [
-  { status: 'PRESENT', checkIn: '09:05', checkOut: '18:10' },
-  { status: 'PRESENT', checkIn: '09:12', checkOut: '17:58' },
-  { status: 'ABSENT', checkIn: null, checkOut: null },
-  { status: 'HALF_DAY', checkIn: '09:30', checkOut: '13:15' },
+  {
+    status: 'PRESENT',
+    checkIn: '09:05',
+    checkOut: '18:10',
+    workHours: '09h 05m',
+    extraHours: '01h 05m',
+  },
+  {
+    status: 'PRESENT',
+    checkIn: '09:12',
+    checkOut: '17:58',
+    workHours: '08h 16m',
+    extraHours: '00h 16m',
+  },
+  {
+    status: 'ABSENT',
+    checkIn: null,
+    checkOut: null,
+    workHours: '00h 00m',
+    extraHours: '00h 00m',
+  },
+  {
+    status: 'HALF_DAY',
+    checkIn: '09:30',
+    checkOut: '13:15',
+    workHours: '03h 45m',
+    extraHours: '00h 00m',
+  },
 ]
 
 let sequence = 1
@@ -78,14 +108,13 @@ const nextId = (prefix) => `${prefix}-${sequence++}`
 // inside a FINALIZED PayrollRun (spec §4/§5): corrections remain allowed but
 // the UI must surface that they do not affect the existing payslip.
 const store = {
-  records: previousWorkingDates(4).map((date, index) => ({
-    id: nextId('att'),
-    date,
-    status: HISTORY_TEMPLATE[index].status,
-    checkIn: HISTORY_TEMPLATE[index].checkIn,
-    checkOut: HISTORY_TEMPLATE[index].checkOut,
-    payrollFinalized: true,
-  })),
+    records: previousWorkingDates(8).map((date, index) => ({
+      ...HISTORY_TEMPLATE[index % HISTORY_TEMPLATE.length],
+      id: nextId('att'),
+      date,
+      day: dayLabel(date),
+      payrollFinalized: true,
+    })),
   corrections: [],
 }
 
@@ -110,6 +139,49 @@ export async function getMyAttendance() {
   // Final schema pending docs/api.md.
   const records = [...store.records].sort((a, b) => b.date.localeCompare(a.date))
   return mockResponse(records)
+}
+
+export async function listEmployeeAttendanceSummary() {
+  // Contract area: ATTENDANCE — Admin's current-day employee summary. Work
+  // and extra hours are service-provided values; the UI only presents them.
+  const date = isoDate()
+  return mockResponse([
+    {
+      employeeId: 'emp-demo',
+      employeeName: 'Demo Employee',
+      date,
+      status: 'PRESENT',
+      checkIn: '09:05',
+      checkOut: '18:10',
+      workHours: '09h 05m',
+      extraHours: '01h 05m',
+    },
+    {
+      employeeId: 'adm-demo',
+      employeeName: 'Demo Admin',
+      date,
+      status: 'LEAVE',
+      checkIn: null,
+      checkOut: null,
+      workHours: '—',
+      extraHours: '—',
+    },
+    {
+      employeeId: 'emp-first',
+      employeeName: 'First Login Employee',
+      date,
+      status: 'ABSENT',
+      checkIn: null,
+      checkOut: null,
+      workHours: '00h 00m',
+      extraHours: '00h 00m',
+    },
+  ])
+}
+
+export async function getEmployeeAttendanceSummary(employeeId) {
+  const summaries = await listEmployeeAttendanceSummary()
+  return mockResponse(summaries.find((summary) => summary.employeeId === employeeId) ?? null)
 }
 
 export async function checkIn() {
@@ -138,6 +210,9 @@ export async function checkIn() {
       status: 'PRESENT',
       checkIn: null,
       checkOut: null,
+      day: dayLabel(today),
+      workHours: null,
+      extraHours: null,
       payrollFinalized: false,
       ...(weekend ? { devWeekendTest: true } : {}),
     }
@@ -163,6 +238,10 @@ export async function checkOut() {
   }
 
   record.checkOut = nowHHMM()
+  // The backend returns these attendance measures after checkout; React does
+  // not derive them from timestamps.
+  record.workHours = '08h 00m'
+  record.extraHours = '00h 00m'
   return mockResponse({ ...record })
 }
 

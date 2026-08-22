@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
 import AttentionScore from '../../components/ui/AttentionScore.jsx'
@@ -27,6 +27,7 @@ export default function AttendanceCorrectionsPage() {
   })
   const [busyId, setBusyId] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const actionLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -40,7 +41,8 @@ export default function AttendanceCorrectionsPage() {
   const queue = Array.isArray(data.queue) ? data.queue : []
 
   async function handleDecision(requestId, decision) {
-    if (busyId) return
+    if (actionLockRef.current || busyId) return
+    actionLockRef.current = true
     setBusyId(requestId)
     setActionError(null)
     try {
@@ -51,6 +53,7 @@ export default function AttendanceCorrectionsPage() {
       setActionError(error.message || 'Could not record the decision.')
     } finally {
       setBusyId(null)
+      actionLockRef.current = false
     }
   }
 

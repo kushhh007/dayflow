@@ -15,6 +15,11 @@ import './leavePage.css'
 // mirrors of backend validations.
 
 const LEAVE_TYPES = ['PAID', 'SICK', 'UNPAID']
+const LEAVE_TYPE_LABELS = {
+  PAID: 'Paid Time Off',
+  SICK: 'Sick Leave',
+  UNPAID: 'Unpaid Leave',
+}
 
 const dayFormat = new Intl.DateTimeFormat('en-IN', {
   weekday: 'short',
@@ -42,9 +47,11 @@ export default function LeavePage() {
   const [formError, setFormError] = useState(null)
   const [submitted, setSubmitted] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const submitLockRef = useRef(false)
 
   const [cancelBusyId, setCancelBusyId] = useState(null)
   const [cancelError, setCancelError] = useState(null)
+  const cancelLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -80,12 +87,13 @@ export default function LeavePage() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (submitting) return
+    if (submitLockRef.current || submitting) return
     const validationError = validate()
     if (validationError) {
       setFormError(validationError)
       return
     }
+    submitLockRef.current = true
     setSubmitting(true)
     setFormError(null)
     try {
@@ -105,11 +113,13 @@ export default function LeavePage() {
       setFormError(err.message || 'Could not submit the leave request.')
     } finally {
       setSubmitting(false)
+      submitLockRef.current = false
     }
   }
 
   async function handleCancel(requestId) {
-    if (cancelBusyId) return
+    if (cancelLockRef.current || cancelBusyId) return
+    cancelLockRef.current = true
     setCancelBusyId(requestId)
     setCancelError(null)
     try {
@@ -119,6 +129,7 @@ export default function LeavePage() {
       setCancelError(err.message || 'Could not cancel the request.')
     } finally {
       setCancelBusyId(null)
+      cancelLockRef.current = false
     }
   }
 
@@ -143,7 +154,7 @@ export default function LeavePage() {
               {balances.map((balance) => (
                 <li key={balance.type} className="att-row">
                   <div>
-                    <p className="att-row__title">{balance.type}</p>
+                    <p className="att-row__title">{LEAVE_TYPE_LABELS[balance.type] ?? balance.type}</p>
                     {balance.allocated == null ? (
                       <p className="att-row__meta">No allocation — not balance-checked</p>
                     ) : (
@@ -171,7 +182,7 @@ export default function LeavePage() {
               >
                 {LEAVE_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type}
+                    {LEAVE_TYPE_LABELS[type]}
                   </option>
                 ))}
               </select>
@@ -265,7 +276,7 @@ export default function LeavePage() {
                   <li key={request.id} className="att-row">
                     <div>
                       <p className="att-row__title">
-                        {request.type} leave · {formatRange(request.startDate, request.endDate)}
+                        {LEAVE_TYPE_LABELS[request.type] ?? request.type} · {formatRange(request.startDate, request.endDate)}
                       </p>
                       <p className="att-row__meta">
                         {request.days} {request.days === 1 ? 'day' : 'days'} · {request.reason}

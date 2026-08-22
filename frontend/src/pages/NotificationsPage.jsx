@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth.js'
 import { useAsyncData } from '../hooks/useAsyncData.js'
 import Loading from '../components/states/Loading.jsx'
@@ -25,6 +25,7 @@ export default function NotificationsPage() {
   const [readIds, setReadIds] = useState(() => new Set())
   const [busyId, setBusyId] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const readLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -41,7 +42,8 @@ export default function NotificationsPage() {
   ).length
 
   async function handleMarkRead(notificationId) {
-    if (busyId) return
+    if (readLockRef.current || busyId) return
+    readLockRef.current = true
     setBusyId(notificationId)
     setActionError(null)
     try {
@@ -51,6 +53,7 @@ export default function NotificationsPage() {
       setActionError(error.message || 'Could not mark the notification as read.')
     } finally {
       setBusyId(null)
+      readLockRef.current = false
     }
   }
 

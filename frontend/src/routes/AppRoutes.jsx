@@ -14,6 +14,8 @@ import LeavePage from '../pages/employee/LeavePage.jsx'
 import PayslipsPage from '../pages/employee/PayslipsPage.jsx'
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage.jsx'
 import EmployeesPage from '../pages/admin/EmployeesPage.jsx'
+import AdminEmployeeProfilePage from '../pages/admin/AdminEmployeeProfilePage.jsx'
+import AdminAttendancePage from '../pages/admin/AdminAttendancePage.jsx'
 import AttendanceCorrectionsPage from '../pages/admin/AttendanceCorrectionsPage.jsx'
 import LeaveApprovalsPage from '../pages/admin/LeaveApprovalsPage.jsx'
 import PayrollPage from '../pages/admin/PayrollPage.jsx'
@@ -95,6 +97,8 @@ export default function AppRoutes() {
           <Route element={<RequireRole role={ROLES.ADMIN} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/employees" element={<EmployeesPage />} />
+            <Route path="/admin/employees/:employeeId" element={<AdminEmployeeProfilePage />} />
+            <Route path="/admin/attendance" element={<AdminAttendancePage />} />
             <Route path="/admin/attendance-corrections" element={<AttendanceCorrectionsPage />} />
             <Route path="/admin/leave-approvals" element={<LeaveApprovalsPage />} />
             <Route path="/admin/payroll" element={<PayrollPage />} />

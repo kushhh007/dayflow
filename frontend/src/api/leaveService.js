@@ -102,6 +102,13 @@ export async function listLeaveRequests() {
   return mockResponse(requests)
 }
 
+export async function listAllLeaveRequests() {
+  // Contract area: LEAVE — Admin's company-wide leave records. The eventual
+  // API owns tenant and role filtering; this mock returns the seeded records.
+  const requests = [...store.requests].sort((a, b) => b.startDate.localeCompare(a.startDate))
+  return mockResponse(requests)
+}
+
 export async function listApprovalQueue() {
   // Contract area: OPS/LEAVE — Attention-ranked pending queue for Admins
   // (spec §10). Scores and breakdowns are server-provided and arrive

@@ -1,11 +1,15 @@
 import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
+import ProfileAvatar from '../../components/ui/ProfileAvatar.jsx'
+import EmployeeWorkStatus from '../../components/ui/EmployeeWorkStatus.jsx'
 import StatusBadge from '../../components/ui/StatusBadge.jsx'
 import Loading from '../../components/states/Loading.jsx'
 import EmptyState from '../../components/states/EmptyState.jsx'
 import ErrorState from '../../components/states/ErrorState.jsx'
 import * as employeeService from '../../api/employeeService.js'
+import * as attendanceService from '../../api/attendanceService.js'
 import './employeesPage.css'
 
 const EMPTY_FORM = {
@@ -17,6 +21,7 @@ const EMPTY_FORM = {
   personalEmail: '',
   residingAddress: '',
   profilePicture: '',
+  location: '',
   manager: '',
 }
 
@@ -30,6 +35,7 @@ function formFromEmployee(employee) {
     personalEmail: employee.personalEmail ?? '',
     residingAddress: employee.residingAddress ?? '',
     profilePicture: employee.profilePicture ?? '',
+    location: employee.location ?? '',
     manager: employee.manager ?? '',
   }
 }
@@ -83,6 +89,7 @@ export default function EmployeesPage() {
     employees: employeeService.listEmployees,
     departments: employeeService.listDepartments,
     jobPositions: employeeService.listJobPositions,
+    attendance: attendanceService.listEmployeeAttendanceSummary,
   })
   const [createForm, setCreateForm] = useState(EMPTY_FORM)
   const [editEmployeeId, setEditEmployeeId] = useState(null)
@@ -108,7 +115,11 @@ export default function EmployeesPage() {
   const employees = Array.isArray(data.employees) ? data.employees : []
   const departments = Array.isArray(data.departments) ? data.departments : []
   const jobPositions = Array.isArray(data.jobPositions) ? data.jobPositions : []
-  const dataError = errors.employees || errors.departments || errors.jobPositions
+  const attendance = Array.isArray(data.attendance) ? data.attendance : []
+  const attendanceByEmployeeId = Object.fromEntries(
+    attendance.map((summary) => [summary.employeeId, summary]),
+  )
+  const dataError = errors.employees || errors.departments || errors.jobPositions || errors.attendance
   const editingEmployee = employees.find((employee) => employee.id === editEmployeeId)
 
   function updateForm(setter, event) {
@@ -351,6 +362,22 @@ export default function EmployeesPage() {
               disabled={Boolean(busyKey)}
               onChange={(event) => updateForm(setCreateForm, event)}
             />
+            <div className="employee-form__row">
+              <Field
+                label="Profile picture reference"
+                name="profilePicture"
+                value={createForm.profilePicture}
+                disabled={Boolean(busyKey)}
+                onChange={(event) => updateForm(setCreateForm, event)}
+              />
+              <Field
+                label="Location"
+                name="location"
+                value={createForm.location}
+                disabled={Boolean(busyKey)}
+                onChange={(event) => updateForm(setCreateForm, event)}
+              />
+            </div>
             <Field
               label="Manager"
               name="manager"
@@ -440,13 +467,20 @@ export default function EmployeesPage() {
                   onChange={(event) => updateForm(setEditForm, event)}
                 />
                 <Field
+                  label="Location"
+                  name="location"
+                  value={editForm.location}
+                  disabled={Boolean(busyKey)}
+                  onChange={(event) => updateForm(setEditForm, event)}
+                />
+              </div>
+              <Field
                   label="Manager"
                   name="manager"
                   value={editForm.manager}
                   disabled={Boolean(busyKey)}
                   onChange={(event) => updateForm(setEditForm, event)}
-                />
-              </div>
+              />
               {formError && <p className="employee-banner employee-banner--error" role="alert">{formError}</p>}
               <div className="employee-form__actions">
                 <button type="submit" className="employee-button" disabled={Boolean(busyKey)}>
@@ -466,24 +500,32 @@ export default function EmployeesPage() {
           <EmptyState title="No employees yet" message="Create an employee to populate the directory." />
         ) : (
           <ul className="employee-list">
-            {employees.map((employee) => (
-              <li className="employee-row" key={employee.id}>
-                <div className="employee-row__main">
-                  <div className="employee-row__heading">
-                    <p className="employee-row__name">{employee.name}</p>
-                    <StatusBadge status={employee.status} />
-                  </div>
-                  <p className="employee-row__meta">Login ID: {employee.loginId || '—'}</p>
-                  <div className="employee-row__details">
-                    <span>{employee.department || 'Department unavailable'}</span>
-                    <span>{employee.jobPosition || 'Position unavailable'}</span>
-                    <span>Joined {employee.joinDate || '—'}</span>
-                    {employee.status === 'INACTIVE' && (
-                      <span>Ended {employee.employmentEndDate || '—'}</span>
-                    )}
-                  </div>
-                </div>
-                <div className="employee-row__actions">
+            {employees.map((employee) => {
+              const attendanceSummary = attendanceByEmployeeId[employee.id]
+              return (
+                <li className="employee-row" key={employee.id}>
+                  <Link className="employee-row__link" to={`/admin/employees/${employee.id}`}>
+                    <div className="employee-row__avatar">
+                      <ProfileAvatar name={employee.name} src={employee.profilePicture} />
+                    </div>
+                    <div className="employee-row__main">
+                      <div className="employee-row__heading">
+                        <p className="employee-row__name">{employee.name}</p>
+                        <StatusBadge status={employee.status} />
+                      </div>
+                      <p className="employee-row__meta">Login ID: {employee.loginId || '—'}</p>
+                      <div className="employee-row__details">
+                        <span>{employee.department || 'Department unavailable'}</span>
+                        <span>{employee.jobPosition || 'Position unavailable'}</span>
+                        <span>Joined {employee.joinDate || '—'}</span>
+                        {employee.status === 'INACTIVE' && (
+                          <span>Ended {employee.employmentEndDate || '—'}</span>
+                        )}
+                      </div>
+                    </div>
+                    <EmployeeWorkStatus summary={attendanceSummary} employeeStatus={employee.status} />
+                  </Link>
+                  <div className="employee-row__actions">
                   <button
                     type="button"
                     className="employee-button employee-button--quiet"
@@ -511,39 +553,40 @@ export default function EmployeesPage() {
                       {busyKey === `reactivate:${employee.id}` ? 'Reactivating…' : 'Reactivate'}
                     </button>
                   )}
-                </div>
-                {deactivateTarget?.id === employee.id && (
-                  <form className="employee-deactivate" onSubmit={handleDeactivate} noValidate>
-                    <label className="employee-field">
-                      <span>Employment end date *</span>
-                      <input
-                        type="date"
-                        value={employmentEndDate}
-                        min={employee.joinDate}
-                        required
-                        disabled={Boolean(busyKey)}
-                        onChange={(event) => setEmploymentEndDate(event.target.value)}
-                      />
-                    </label>
-                    <p className="employee-banner__note">
-                      This explicit date is required; deactivation will not happen immediately without confirmation.
-                    </p>
-                    <div className="employee-form__actions">
-                      <button
-                        type="submit"
-                        className="employee-button employee-button--danger"
-                        disabled={Boolean(busyKey) || !employmentEndDate}
-                      >
-                        {busyKey === `deactivate:${employee.id}` ? 'Deactivating…' : 'Confirm deactivation'}
-                      </button>
-                      <button type="button" className="employee-button employee-button--quiet" disabled={Boolean(busyKey)} onClick={closeDeactivate}>
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </li>
-            ))}
+                  </div>
+                  {deactivateTarget?.id === employee.id && (
+                    <form className="employee-deactivate" onSubmit={handleDeactivate} noValidate>
+                      <label className="employee-field">
+                        <span>Employment end date *</span>
+                        <input
+                          type="date"
+                          value={employmentEndDate}
+                          min={employee.joinDate}
+                          required
+                          disabled={Boolean(busyKey)}
+                          onChange={(event) => setEmploymentEndDate(event.target.value)}
+                        />
+                      </label>
+                      <p className="employee-banner__note">
+                        This explicit date is required; deactivation will not happen immediately without confirmation.
+                      </p>
+                      <div className="employee-form__actions">
+                        <button
+                          type="submit"
+                          className="employee-button employee-button--danger"
+                          disabled={Boolean(busyKey) || !employmentEndDate}
+                        >
+                          {busyKey === `deactivate:${employee.id}` ? 'Deactivating…' : 'Confirm deactivation'}
+                        </button>
+                        <button type="button" className="employee-button employee-button--quiet" disabled={Boolean(busyKey)} onClick={closeDeactivate}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         )}
       </DashboardCard>

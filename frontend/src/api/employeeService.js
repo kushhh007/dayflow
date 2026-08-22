@@ -43,16 +43,48 @@ const store = {
       jobPositionId: 'job-software-engineer',
       jobPosition: 'Software Engineer',
       manager: 'Demo Admin',
+      company: 'Dayflow Technologies',
+      location: 'Bengaluru',
+      employeeCode: 'DF-EMP-0001',
       joinDate: '2026-01-15',
       status: 'ACTIVE',
       employmentEndDate: null,
+      about: 'Builds reliable internal tools for the People Operations team.',
+      jobLove: 'Turning complex workflows into simple employee experiences.',
+      interestsAndHobbies: 'Cycling, photography, and weekend cooking.',
+      resume: 'demo-employee-resume.pdf',
+      skills: 'React, JavaScript, workflow design',
+      certifications: 'Professional Scrum Foundations',
       dateOfBirth: '1994-07-12',
       gender: 'Not specified',
       maritalStatus: 'Not specified',
       nationality: 'Indian',
-      bankDetails: 'Account ending 4821',
+      bankDetails: {
+        accountNumber: 'Account ending 4821',
+        bankName: 'HDFC Bank',
+        ifscCode: 'HDFC0001234',
+      },
       pan: 'ABCDE****F',
       uan: '1000******',
+      salaryInformation: {
+        wageType: 'Monthly',
+        monthlyWage: 52000,
+        yearlyWage: 624000,
+        basicSalary: 26000,
+        houseRentAllowance: 13000,
+        standardAllowance: 4167,
+        performanceBonus: 2166,
+        leaveTravelAllowance: 2166,
+        fixedAllowance: 4501,
+        professionalTax: 200,
+        providentFund: {
+          employeeContribution: 3120,
+          employerContribution: 3120,
+          employeeRate: '12%',
+          employerRate: '12%',
+        },
+        componentConfiguration: 'Configured monthly salary structure snapshot.',
+      },
     },
     {
       id: 'adm-demo',
@@ -68,16 +100,48 @@ const store = {
       jobPositionId: 'job-hr-manager',
       jobPosition: 'HR Manager',
       manager: null,
+      company: 'Dayflow Technologies',
+      location: 'Bengaluru',
+      employeeCode: 'DF-ADM-0001',
       joinDate: '2025-06-01',
       status: 'ACTIVE',
       employmentEndDate: null,
+      about: 'Keeps employee operations clear, timely, and human.',
+      jobLove: 'Helping teams do their best work with less friction.',
+      interestsAndHobbies: 'Reading, gardening, and community volunteering.',
+      resume: 'demo-admin-resume.pdf',
+      skills: 'People operations, payroll coordination, compliance',
+      certifications: 'SHRM Essentials',
       dateOfBirth: '1988-03-22',
       gender: 'Not specified',
       maritalStatus: 'Not specified',
       nationality: 'Indian',
-      bankDetails: 'Account ending 7310',
+      bankDetails: {
+        accountNumber: 'Account ending 7310',
+        bankName: 'ICICI Bank',
+        ifscCode: 'ICIC0005678',
+      },
       pan: 'FGHIJ****K',
       uan: '2000******',
+      salaryInformation: {
+        wageType: 'Monthly',
+        monthlyWage: 78000,
+        yearlyWage: 936000,
+        basicSalary: 39000,
+        houseRentAllowance: 19500,
+        standardAllowance: 4167,
+        performanceBonus: 3250,
+        leaveTravelAllowance: 3250,
+        fixedAllowance: 8833,
+        professionalTax: 200,
+        providentFund: {
+          employeeContribution: 4680,
+          employerContribution: 4680,
+          employeeRate: '12%',
+          employerRate: '12%',
+        },
+        componentConfiguration: 'Configured monthly salary structure snapshot.',
+      },
     },
     {
       id: 'emp-first',
@@ -93,9 +157,18 @@ const store = {
       jobPositionId: 'job-software-engineer',
       jobPosition: 'Software Engineer',
       manager: 'Demo Admin',
+      company: 'Dayflow Technologies',
+      location: 'Bengaluru',
+      employeeCode: 'DF-EMP-0002',
       joinDate: '2026-02-01',
       status: 'ACTIVE',
       employmentEndDate: null,
+      about: null,
+      jobLove: null,
+      interestsAndHobbies: null,
+      resume: null,
+      skills: null,
+      certifications: null,
       dateOfBirth: null,
       gender: null,
       maritalStatus: null,
@@ -103,13 +176,15 @@ const store = {
       bankDetails: null,
       pan: null,
       uan: null,
+      salaryInformation: null,
     },
   ],
 }
 
 function publicEmployee(employee) {
-  const { temporaryPassword, ...payload } = employee
+  const { temporaryPassword, salaryInformation, ...payload } = employee
   void temporaryPassword
+  void salaryInformation
   return { ...payload }
 }
 
@@ -232,9 +307,18 @@ export async function createEmployee(payload = {}) {
     jobPositionId: jobPosition.id,
     jobPosition: jobPosition.name,
     manager: String(payload.manager ?? '').trim() || null,
+    company: 'Dayflow Technologies',
+    location: String(payload.location ?? '').trim() || null,
+    employeeCode: null,
     joinDate,
     status: 'ACTIVE',
     employmentEndDate: null,
+    about: String(payload.about ?? '').trim() || null,
+    jobLove: String(payload.jobLove ?? '').trim() || null,
+    interestsAndHobbies: String(payload.interestsAndHobbies ?? '').trim() || null,
+    resume: String(payload.resume ?? '').trim() || null,
+    skills: String(payload.skills ?? '').trim() || null,
+    certifications: String(payload.certifications ?? '').trim() || null,
     dateOfBirth: String(payload.dateOfBirth ?? '').trim() || null,
     gender: String(payload.gender ?? '').trim() || null,
     maritalStatus: String(payload.maritalStatus ?? '').trim() || null,
@@ -242,6 +326,7 @@ export async function createEmployee(payload = {}) {
     bankDetails: null,
     pan: null,
     uan: null,
+    salaryInformation: null,
   }
 
   store.employees.push(employee)
@@ -260,7 +345,16 @@ const ADMIN_EDITABLE_FIELDS = new Set([
   'departmentId',
   'jobPositionId',
   'manager',
+  'company',
+  'location',
   'joinDate',
+  'about',
+  'jobLove',
+  'interestsAndHobbies',
+  'resume',
+  'skills',
+  'certifications',
+  'bankDetails',
   'dateOfBirth',
   'gender',
   'maritalStatus',
@@ -304,6 +398,14 @@ export async function updateOwnProfile(employeeId, payload = {}) {
   validateContactFields(payload)
   Object.assign(employee, payload)
   return mockResponse(publicEmployee(employee))
+}
+
+export async function getEmployeeSalary(employeeId) {
+  // Contract area: EMPLOYEES/PAYROLL — Admin-only salary structure payload.
+  // The eventual API must enforce the role; this mock keeps salary data out of
+  // publicEmployee so employee-facing profile and directory calls cannot see it.
+  const employee = requireEmployee(employeeId)
+  return mockResponse(employee.salaryInformation ? { ...employee.salaryInformation } : null)
 }
 
 export async function deactivateEmployee(employeeId, employmentEndDate) {

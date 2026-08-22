@@ -1,0 +1,58 @@
+.admin-attendance__table {
+  overflow-x: auto;
+}
+
+.admin-attendance__head,
+.admin-attendance__row {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.4fr) minmax(130px, 0.9fr) minmax(150px, 1fr) minmax(100px, 0.7fr) minmax(100px, 0.7fr);
+  align-items: center;
+  gap: 14px;
+  min-width: 760px;
+}
+
+.admin-attendance__head {
+  padding: 0 0 10px;
+  color: var(--df-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.admin-attendance__row {
+  padding: 12px 0;
+  border-top: 1px solid var(--df-border);
+  font-size: 13px;
+}
+
+.admin-attendance__employee,
+.admin-attendance__status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.admin-attendance__employee > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-attendance__employee span {
+  overflow: hidden;
+  color: var(--df-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-attendance__status {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .admin-attendance__head,
+  .admin-attendance__row {
+    min-width: 700px;
+  }
+}

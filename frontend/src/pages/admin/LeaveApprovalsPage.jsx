@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
+import StatusBadge from '../../components/ui/StatusBadge.jsx'
 import Loading from '../../components/states/Loading.jsx'
 import EmptyState from '../../components/states/EmptyState.jsx'
 import ErrorState from '../../components/states/ErrorState.jsx'
@@ -19,6 +20,12 @@ const dayFormat = new Intl.DateTimeFormat('en-IN', {
   month: 'short',
 })
 
+const LEAVE_TYPE_LABELS = {
+  PAID: 'Paid Time Off',
+  SICK: 'Sick Leave',
+  UNPAID: 'Unpaid Leave',
+}
+
 function formatRange(start, end) {
   const startLabel = dayFormat.format(new Date(`${start}T00:00:00`))
   if (start === end) return startLabel
@@ -28,10 +35,12 @@ function formatRange(start, end) {
 export default function LeaveApprovalsPage() {
   const { loading, data, errors, retry } = useAsyncData({
     queue: leaveService.listApprovalQueue,
+    requests: leaveService.listAllLeaveRequests,
   })
 
   const [busyId, setBusyId] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const actionLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -43,7 +52,8 @@ export default function LeaveApprovalsPage() {
   }
 
   async function handleDecision(requestId, decision) {
-    if (busyId) return
+    if (actionLockRef.current || busyId) return
+    actionLockRef.current = true
     setBusyId(requestId)
     setActionError(null)
     try {
@@ -54,10 +64,12 @@ export default function LeaveApprovalsPage() {
       setActionError(err.message || 'Could not record the decision.')
     } finally {
       setBusyId(null)
+      actionLockRef.current = false
     }
   }
 
   const queue = Array.isArray(data.queue) ? data.queue : []
+  const requests = Array.isArray(data.requests) ? data.requests : []
 
   return (
     <section className="page att">
@@ -90,7 +102,7 @@ export default function LeaveApprovalsPage() {
                     <div className="approval-row__main">
                       <div className="approval-row__head">
                         <p className="att-row__title">
-                          {item.employeeName} · {item.type} leave
+                          {item.employeeName} · {LEAVE_TYPE_LABELS[item.type] ?? item.type}
                         </p>
                         {item.attentionScore != null && (
                           <span className="approval-score">
@@ -136,6 +148,32 @@ export default function LeaveApprovalsPage() {
                 ))}
               </ul>
             </>
+          )}
+        </DashboardCard>
+
+        <DashboardCard title="Employee leave records">
+          {errors.requests ? (
+            <ErrorState title="Could not load employee leave records" onRetry={retry} />
+          ) : requests.length === 0 ? (
+            <EmptyState title="No employee leave records" message="No leave records were returned." />
+          ) : (
+            <ul className="att-list">
+              {requests.map((request) => (
+                <li key={request.id} className="att-row">
+                  <div>
+                    <p className="att-row__title">
+                      {request.employeeName || 'Employee'} · {LEAVE_TYPE_LABELS[request.type] ?? request.type}
+                    </p>
+                    <p className="att-row__meta">
+                      {formatRange(request.startDate, request.endDate)} · {request.days}{' '}
+                      {request.days === 1 ? 'day' : 'days'}
+                      {request.attachmentName ? ` · Attachment: ${request.attachmentName}` : ''}
+                    </p>
+                  </div>
+                  <StatusBadge status={request.status} />
+                </li>
+              ))}
+            </ul>
           )}
         </DashboardCard>
 

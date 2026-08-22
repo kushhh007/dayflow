@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
@@ -30,6 +30,7 @@ export default function AdminDashboardPage() {
   })
   const [busyId, setBusyId] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const actionLockRef = useRef(false)
 
   if (loading) {
     return (
@@ -49,7 +50,8 @@ export default function AdminDashboardPage() {
   const unreadCount = notifications.filter((notification) => !notification.isRead).length
 
   async function handleQueueAction(item, decision) {
-    if (busyId) return
+    if (actionLockRef.current || busyId) return
+    actionLockRef.current = true
     setBusyId(item.id)
     setActionError(null)
     try {
@@ -66,6 +68,7 @@ export default function AdminDashboardPage() {
       setActionError(error.message || 'Could not record the decision.')
     } finally {
       setBusyId(null)
+      actionLockRef.current = false
     }
   }
 

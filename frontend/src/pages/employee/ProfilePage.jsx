@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useAsyncData } from '../../hooks/useAsyncData.js'
 import DashboardCard from '../../components/ui/DashboardCard.jsx'
+import ProfileAvatar from '../../components/ui/ProfileAvatar.jsx'
 import StatusBadge from '../../components/ui/StatusBadge.jsx'
 import Loading from '../../components/states/Loading.jsx'
 import EmptyState from '../../components/states/EmptyState.jsx'
@@ -130,12 +131,19 @@ export default function ProfilePage() {
 
   return (
     <section className="page profile-page">
-      <header className="page__header">
-        <h1>My Profile</h1>
-        <p className="page__description">
-          View your employee information. Only contact details and profile picture can be edited here.
-        </p>
+      <header className="profile-page__header">
+        <div className="profile-page__identity">
+          <ProfileAvatar name={employee.name} src={employee.profilePicture} size="large" />
+          <div>
+            <h1>My Profile</h1>
+            <p>{employee.name} · {employee.jobPosition || 'Employee'}</p>
+          </div>
+        </div>
+        <StatusBadge status={employee.status} />
       </header>
+      <p className="page__description profile-page__description">
+        View your employee information. Only contact details and profile picture can be edited here.
+      </p>
 
       {feedback && <p className="profile-banner profile-banner--success">{feedback}</p>}
       {saveError && (
@@ -145,32 +153,59 @@ export default function ProfilePage() {
       )}
 
       <div className="profile-page__grid">
-        <DashboardCard title="Employee information">
+        <DashboardCard title="General profile">
+          <div className="profile-page__picture-row">
+            <ProfileAvatar name={employee.name} src={employee.profilePicture} size="medium" />
+            <p>Profile picture is employee-managed through the contact editor.</p>
+          </div>
           <dl className="profile-facts">
             <ReadOnlyFact label="Name" value={employee.name} />
-            <ReadOnlyFact label="Login ID" value={employee.loginId} />
+            <ReadOnlyFact label="Mobile" value={employee.phone} />
+            <ReadOnlyFact label="Email / Personal email" value={employee.personalEmail} />
             <ReadOnlyFact label="Department" value={employee.department} />
             <ReadOnlyFact label="Job position" value={employee.jobPosition} />
             <ReadOnlyFact label="Manager" value={employee.manager} />
-            <ReadOnlyFact label="Join date" value={employee.joinDate} />
-            <ReadOnlyFact label="Date of birth" value={employee.dateOfBirth} />
-            <ReadOnlyFact label="Gender" value={employee.gender} />
-            <ReadOnlyFact label="Marital status" value={employee.maritalStatus} />
-            <ReadOnlyFact label="Nationality" value={employee.nationality} />
-            <ReadOnlyFact label="Bank details" value={employee.bankDetails} />
-            <ReadOnlyFact label="PAN" value={employee.pan} />
-            <ReadOnlyFact label="UAN" value={employee.uan} />
-            {employee.status === 'INACTIVE' && (
-              <ReadOnlyFact label="Employment end date" value={employee.employmentEndDate} />
-            )}
-            <div className="profile-fact">
-              <dt>Employment status</dt>
-              <dd><StatusBadge status={employee.status} /></dd>
-            </div>
+            <ReadOnlyFact label="Company" value={employee.company} />
+            <ReadOnlyFact label="Location" value={employee.location} />
+            <ReadOnlyFact label="Date of joining" value={employee.joinDate} />
+            <ReadOnlyFact label="Employee code" value={employee.employeeCode} />
+            <ReadOnlyFact label="Login ID" value={employee.loginId} />
           </dl>
         </DashboardCard>
 
-        <DashboardCard title="Contact details">
+        <DashboardCard title="About">
+          <dl className="profile-facts">
+            <ReadOnlyFact label="About" value={employee.about} />
+            <ReadOnlyFact label="What I love about my job" value={employee.jobLove} />
+            <ReadOnlyFact label="My interests and hobbies" value={employee.interestsAndHobbies} />
+          </dl>
+        </DashboardCard>
+
+        <DashboardCard title="Private information">
+          <dl className="profile-facts">
+            <ReadOnlyFact label="Resume" value={employee.resume} />
+            <ReadOnlyFact label="Skills" value={employee.skills} />
+            <ReadOnlyFact label="Certifications" value={employee.certifications} />
+            <ReadOnlyFact label="PAN No" value={employee.pan} />
+            <ReadOnlyFact label="UAN No" value={employee.uan} />
+            <ReadOnlyFact label="Date of birth" value={employee.dateOfBirth} />
+            <ReadOnlyFact label="Residing address" value={employee.residingAddress} />
+            <ReadOnlyFact label="Personal email" value={employee.personalEmail} />
+            <ReadOnlyFact label="Gender" value={employee.gender} />
+            <ReadOnlyFact label="Nationality" value={employee.nationality} />
+            <ReadOnlyFact label="Marital status" value={employee.maritalStatus} />
+          </dl>
+        </DashboardCard>
+
+        <DashboardCard title="Bank details">
+          <dl className="profile-facts">
+            <ReadOnlyFact label="Account number" value={employee.bankDetails?.accountNumber} />
+            <ReadOnlyFact label="Bank name" value={employee.bankDetails?.bankName} />
+            <ReadOnlyFact label="IFSC code" value={employee.bankDetails?.ifscCode} />
+          </dl>
+        </DashboardCard>
+
+        <DashboardCard title="Contact details" className="profile-page__contact">
           {editing ? (
             <form className="profile-form" onSubmit={handleSave} noValidate>
               <label className="profile-field">

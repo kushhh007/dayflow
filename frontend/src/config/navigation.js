@@ -9,6 +9,7 @@ export const NAV_ITEMS = [
   { label: 'Payslips', path: '/employee/payslips', roles: ['EMPLOYEE'] },
   { label: 'Daily Brief', path: '/admin', roles: ['ADMIN'], end: true },
   { label: 'Employees', path: '/admin/employees', roles: ['ADMIN'] },
+  { label: 'Attendance', path: '/admin/attendance', roles: ['ADMIN'] },
   { label: 'Attendance Corrections', path: '/admin/attendance-corrections', roles: ['ADMIN'] },
   { label: 'Leave Approvals', path: '/admin/leave-approvals', roles: ['ADMIN'] },
   { label: 'Payroll Runs', path: '/admin/payroll', roles: ['ADMIN'] },

@@ -164,14 +164,72 @@
   background: var(--df-primary-soft);
 }
 
-.topbar__user {
+.topbar__profile {
+  position: relative;
+}
+
+.topbar__profile-trigger {
   display: flex;
   align-items: center;
   gap: 10px;
+  border: 0;
+  padding: 4px;
+  background: transparent;
+  color: var(--df-text);
+  cursor: pointer;
+}
+
+.topbar__profile-trigger:hover {
+  border-radius: 8px;
+  background: var(--df-primary-soft);
 }
 
 .topbar__user-name {
   font-weight: 600;
+}
+
+.topbar__profile-chevron {
+  color: var(--df-text-muted);
+  font-size: 16px;
+}
+
+.topbar__profile-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 50;
+  display: grid;
+  min-width: 150px;
+  padding: 6px;
+  border: 1px solid var(--df-border);
+  border-radius: 10px;
+  background: var(--df-surface);
+  box-shadow: var(--df-shadow);
+}
+
+.topbar__profile-menu a,
+.topbar__profile-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--df-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.topbar__profile-menu a:hover,
+.topbar__profile-menu button:hover {
+  background: var(--df-primary-soft);
+}
+
+.topbar__profile-menu button {
+  color: var(--df-danger);
 }
 
 .topbar__logout {
