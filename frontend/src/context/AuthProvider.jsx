@@ -44,17 +44,20 @@ export function AuthProvider({ children }) {
     persistUser(null)
   }, [])
 
-  const completePasswordChange = useCallback(async () => {
-    await changePasswordRequest()
-    // Frontend-only completion: the real backend will own the password change
-    // and session behavior once the auth contract exists.
-    setUser((current) => {
-      if (!current) return current
-      const updated = { ...current, mustChangePassword: false }
-      persistUser(updated)
-      return updated
-    })
-  }, [])
+  const completePasswordChange = useCallback(
+    async ({ newPassword }) => {
+      await changePasswordRequest({ loginId: user?.loginId, newPassword })
+      // Frontend-only completion: the real backend will own the password change
+      // and session behavior once the auth contract exists.
+      setUser((current) => {
+        if (!current) return current
+        const updated = { ...current, mustChangePassword: false }
+        persistUser(updated)
+        return updated
+      })
+    },
+    [user],
+  )
 
   const value = useMemo(
     () => ({
