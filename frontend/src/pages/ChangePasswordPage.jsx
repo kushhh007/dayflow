@@ -42,7 +42,7 @@ export default function ChangePasswordPage() {
     setSubmitting(true)
     setError(null)
     try {
-      await completePasswordChange({ newPassword: password })
+      await completePasswordChange({ newPassword })
       navigate(homePathForRole(user?.role), { replace: true })
     } catch (err) {
       setError(err.message || 'Could not update your password.')
