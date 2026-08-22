@@ -15,6 +15,10 @@ function toDate(dateString: string): Date {
   return new Date(`${dateString}T00:00:00.000Z`);
 }
 
+async function lockCompanyForPayroll(tx: Prisma.TransactionClient, companyId: string) {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${companyId}))`;
+}
+
 export interface CreateRunInput {
   periodStart: string;
   periodEnd: string;
@@ -28,24 +32,21 @@ export async function createRun(viewer: AuthedUser, input: CreateRunInput) {
     throw new HttpError(400, 'Run period contains zero Mon-Fri working days');
   }
 
-  const overlap = await prisma.payrollRun.findFirst({
-    where: {
-      companyId: viewer.companyId,
-      status: 'FINALIZED',
-      periodStart: { lte: end },
-      periodEnd: { gte: start }
-    }
-  });
-  if (overlap) throw new HttpError(409, 'Period overlaps an already finalized run');
+  return prisma.$transaction(async (tx) => {
+    await lockCompanyForPayroll(tx, viewer.companyId);
 
-  return prisma.payrollRun.create({
-    data: {
-      companyId: viewer.companyId,
-      periodStart: start,
-      periodEnd: end,
-      status: 'DRAFT',
-      createdById: viewer.id
-    }
+    const overlap = await findFinalizedOverlap(tx, viewer.companyId, start, end);
+    if (overlap) throw new HttpError(409, 'Period overlaps an already finalized run');
+
+    return tx.payrollRun.create({
+      data: {
+        companyId: viewer.companyId,
+        periodStart: start,
+        periodEnd: end,
+        status: 'DRAFT',
+        createdById: viewer.id
+      }
+    });
   });
 }
 
@@ -183,6 +184,7 @@ export async function calculateRun(runId: string) {
     if (run.status === 'FINALIZED') {
       throw new HttpError(409, 'FINALIZED runs are immutable and cannot be recalculated');
     }
+    await lockCompanyForPayroll(tx, run.companyId);
 
     const employees = await tx.employee.findMany({
       where: { companyId: run.companyId },
@@ -248,7 +250,14 @@ export async function calculateRun(runId: string) {
     );
 
     await tx.payslip.deleteMany({ where: { payrollRunId: runId, finalized: false } });
-    await tx.payslip.createMany({ data: rows });
+    try {
+      await tx.payslip.createMany({ data: rows });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new HttpError(409, 'A calculation for this run is already in progress');
+      }
+      throw err;
+    }
 
     return tx.payrollRun.update({ where: { id: runId }, data: { status: 'CALCULATED' } });
   });
@@ -258,6 +267,8 @@ export async function finalizeRun(runId: string, viewer: AuthedUser) {
   return prisma.$transaction(async (tx) => {
     const existing = await tx.payrollRun.findUnique({ where: { id: runId } });
     if (!existing) throw new HttpError(404, 'Payroll run not found');
+
+    await lockCompanyForPayroll(tx, existing.companyId);
 
     const overlap = await findFinalizedOverlap(
       tx,
