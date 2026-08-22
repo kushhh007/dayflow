@@ -1,0 +1,32 @@
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.page__header h1 {
+  font-size: 24px;
+  letter-spacing: -0.2px;
+}
+
+.page__description {
+  margin: 6px 0 0;
+  color: var(--df-text-muted);
+  max-width: 70ch;
+}
+
+.page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--df-primary-soft);
+  color: var(--df-primary-strong);
+  font-size: 12px;
+  font-weight: 600;
+}
