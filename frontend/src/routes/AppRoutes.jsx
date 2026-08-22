@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { ROLES } from '../constants/roles.js'
 import { useAuth } from '../hooks/useAuth.js'
+import { homePathForRole } from '../config/navigation.js'
 import AppLayout from '../components/layout/AppLayout.jsx'
 import LoginPage from '../pages/LoginPage.jsx'
 import ChangePasswordPage from '../pages/ChangePasswordPage.jsx'
@@ -18,18 +19,39 @@ import LeaveApprovalsPage from '../pages/admin/LeaveApprovalsPage.jsx'
 import PayrollPage from '../pages/admin/PayrollPage.jsx'
 import AdminPayslipsPage from '../pages/admin/AdminPayslipsPage.jsx'
 
-function RequireAuth() {
-  const { isAuthenticated } = useAuth()
+// Guards every authenticated area. Users with a pending first-login password
+// change are locked out of everything except /change-password.
+function RequireSession() {
+  const { isAuthenticated, mustChangePassword } = useAuth()
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+  if (mustChangePassword) {
+    return <Navigate to="/change-password" replace />
+  }
+  return <Outlet />
+}
+
+// /change-password is only reachable while the pending change exists; it sits
+// outside RequireSession so the redirect above cannot loop against it.
+function RequirePasswordChange() {
+  const { isAuthenticated, mustChangePassword, role } = useAuth()
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+  if (!mustChangePassword) {
+    return <Navigate to={homePathForRole(role)} replace />
   }
   return <Outlet />
 }
 
 function RequireRole({ role }) {
-  const { isAuthenticated, role: userRole } = useAuth()
+  const { isAuthenticated, mustChangePassword, role: userRole } = useAuth()
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+  if (mustChangePassword) {
+    return <Navigate to="/change-password" replace />
   }
   if (userRole !== role) {
     return <Navigate to="/" replace />
@@ -38,11 +60,14 @@ function RequireRole({ role }) {
 }
 
 function RoleRedirect() {
-  const { isAuthenticated, role } = useAuth()
+  const { isAuthenticated, mustChangePassword, role } = useAuth()
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
-  return <Navigate to={role === ROLES.ADMIN ? '/admin' : '/employee'} replace />
+  if (mustChangePassword) {
+    return <Navigate to="/change-password" replace />
+  }
+  return <Navigate to={homePathForRole(role)} replace />
 }
 
 export default function AppRoutes() {
@@ -51,9 +76,11 @@ export default function AppRoutes() {
       <Route path="/" element={<RoleRedirect />} />
       <Route path="/login" element={<LoginPage />} />
 
-      <Route element={<RequireAuth />}>
+      <Route element={<RequirePasswordChange />}>
         <Route path="/change-password" element={<ChangePasswordPage />} />
+      </Route>
 
+      <Route element={<RequireSession />}>
         <Route element={<AppLayout />}>
           <Route path="/notifications" element={<NotificationsPage />} />
 

@@ -1,6 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AuthContext } from './authContext.js'
-import { login as loginRequest, logout as logoutRequest } from '../api/authService.js'
+import {
+  login as loginRequest,
+  logout as logoutRequest,
+  changePassword as changePasswordRequest,
+} from '../api/authService.js'
 
 const STORAGE_KEY = 'dayflow.session'
 
@@ -40,15 +44,29 @@ export function AuthProvider({ children }) {
     persistUser(null)
   }, [])
 
+  const completePasswordChange = useCallback(async () => {
+    await changePasswordRequest()
+    // Frontend-only completion: the real backend will own the password change
+    // and session behavior once the auth contract exists.
+    setUser((current) => {
+      if (!current) return current
+      const updated = { ...current, mustChangePassword: false }
+      persistUser(updated)
+      return updated
+    })
+  }, [])
+
   const value = useMemo(
     () => ({
       user,
       role: user?.role ?? null,
       isAuthenticated: Boolean(user),
+      mustChangePassword: Boolean(user?.mustChangePassword),
       login,
       logout,
+      completePasswordChange,
     }),
-    [user, login, logout],
+    [user, login, logout, completePasswordChange],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

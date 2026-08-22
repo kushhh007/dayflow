@@ -27,6 +27,14 @@ const DEMO_USERS = [
     role: ROLES.ADMIN,
     mustChangePassword: false,
   },
+  {
+    id: 'emp-first',
+    loginId: 'demo.firstlogin',
+    password: 'temp1234',
+    name: 'First Login Employee',
+    role: ROLES.EMPLOYEE,
+    mustChangePassword: true,
+  },
 ]
 
 function toSessionUser(user) {

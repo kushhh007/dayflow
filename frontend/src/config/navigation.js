@@ -18,3 +18,8 @@ export const NAV_ITEMS = [
 export function navItemsForRole(role) {
   return NAV_ITEMS.filter((item) => item.roles.includes(role))
 }
+
+// Landing path after login / role redirect target.
+export function homePathForRole(role) {
+  return role === 'ADMIN' ? '/admin' : '/employee'
+}
