@@ -12,7 +12,8 @@ function buildAuthResponse(
     tokenVersion: number;
     mustChangePassword: boolean;
   },
-  employeeId: string | null
+  employeeId: string | null,
+  name: string | null
 ) {
   const token = signToken({
     sub: user.id,
@@ -26,6 +27,7 @@ function buildAuthResponse(
       id: user.id,
       loginId: user.loginId,
       role: user.role,
+      name,
       mustChangePassword: user.mustChangePassword,
       employeeId
     }
@@ -35,7 +37,7 @@ function buildAuthResponse(
 export async function login(loginId: string, password: string) {
   const user = await prisma.user.findUnique({
     where: { loginId },
-    include: { employee: { select: { id: true, status: true } } }
+    include: { employee: { select: { id: true, status: true, firstName: true, lastName: true } } }
   });
   if (!user) throw new HttpError(401, 'Invalid credentials');
 
@@ -46,7 +48,10 @@ export async function login(loginId: string, password: string) {
     throw new HttpError(403, 'Employee is inactive and cannot log in');
   }
 
-  return buildAuthResponse(user, user.employee?.id ?? null);
+  const name = user.employee
+    ? `${user.employee.firstName} ${user.employee.lastName}`.trim()
+    : null;
+  return buildAuthResponse(user, user.employee?.id ?? null, name);
 }
 
 export async function changePassword(
@@ -67,8 +72,11 @@ export async function changePassword(
       mustChangePassword: false,
       tokenVersion: { increment: 1 }
     },
-    include: { employee: { select: { id: true } } }
+    include: { employee: { select: { id: true, firstName: true, lastName: true } } }
   });
 
-  return buildAuthResponse(updated, updated.employee?.id ?? null);
+  const name = updated.employee
+    ? `${updated.employee.firstName} ${updated.employee.lastName}`.trim()
+    : null;
+  return buildAuthResponse(updated, updated.employee?.id ?? null, name);
 }

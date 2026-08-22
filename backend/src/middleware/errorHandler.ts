@@ -9,15 +9,17 @@ export function errorHandler(
   _next: NextFunction
 ): void {
   if (err instanceof HttpError) {
-    res
-      .status(err.status)
-      .json(err.details ? { error: err.message, details: err.details } : { error: err.message });
+    const body = err.details
+      ? { error: err.message, message: err.message, details: err.details }
+      : { error: err.message, message: err.message };
+    res.status(err.status).json(body);
     return;
   }
 
   if (err instanceof ZodError) {
     res.status(400).json({
       error: 'Validation failed',
+      message: 'Validation failed',
       details: err.issues.map((issue) => ({
         path: issue.path.join('.'),
         message: issue.message
