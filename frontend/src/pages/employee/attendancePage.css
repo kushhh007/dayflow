@@ -74,6 +74,11 @@
   color: var(--df-warning);
 }
 
+.att-devtag {
+  color: var(--df-text-muted);
+  font-style: italic;
+}
+
 /* Correction form -------------------------------------------------------- */
 
 .att-form {

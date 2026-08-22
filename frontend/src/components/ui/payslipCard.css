@@ -1,0 +1,94 @@
+.payslip {
+  background: var(--df-surface);
+  border: 1px solid var(--df-border);
+  border-radius: var(--df-radius);
+  box-shadow: var(--df-shadow);
+  padding: 18px 20px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.payslip__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.payslip__period {
+  margin: 0;
+  font-weight: 700;
+}
+
+.payslip__employee {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--df-text-muted);
+}
+
+.payslip__net {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--df-primary-soft);
+}
+
+.payslip__net span {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--df-primary-strong);
+}
+
+.payslip__net strong {
+  font-size: 24px;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.payslip__lines {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.payslip__lines > div:not(.payslip__section) {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.payslip__lines dt {
+  color: var(--df-text-muted);
+}
+
+.payslip__lines dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.payslip__section {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--df-text-muted);
+  border-bottom: 1px solid var(--df-border);
+  padding-bottom: 4px;
+}
+
+.payslip__gross dd {
+  font-weight: 600;
+}
+
+.payslip__meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--df-text-muted);
+}

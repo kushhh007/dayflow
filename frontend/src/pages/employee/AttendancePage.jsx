@@ -6,6 +6,7 @@ import Loading from '../../components/states/Loading.jsx'
 import EmptyState from '../../components/states/EmptyState.jsx'
 import ErrorState from '../../components/states/ErrorState.jsx'
 import * as attendanceService from '../../api/attendanceService.js'
+import { isDevWeekendAttendanceEnabled } from '../../api/attendanceService.js'
 import './attendancePage.css'
 
 // Employee attendance (spec §5 scope): display status/history, check-in and
@@ -81,6 +82,12 @@ export default function AttendancePage() {
   // service remains authoritative and rejects non-working-day actions itself.
   const weekday = now.getDay()
   const todayIsWeekend = weekday === 0 || weekday === 6
+
+  // DEVELOPMENT TEST MODE (mock-only): when enabled, weekend buttons stay
+  // usable so the demo flow can be rehearsed on Sat/Sun. Production
+  // semantics are unchanged when the flag is off.
+  const devWeekendMode = todayIsWeekend && isDevWeekendAttendanceEnabled()
+  const weekendBlocked = todayIsWeekend && !devWeekendMode
 
   async function handleCheck(kind) {
     if (actionBusy) return
@@ -170,19 +177,23 @@ export default function AttendancePage() {
                 <EmptyState title="Not checked in yet" message="No attendance recorded for today." />
               )}
 
-              {todayIsWeekend && (
-                <p className="att-banner att-banner--muted">
-                  Attendance is recorded on working days (Mon–Fri) only.
-                </p>
-              )}
+              {todayIsWeekend &&
+                (devWeekendMode ? (
+                  <p className="att-banner att-banner--warning">
+                    DEVELOPMENT TEST MODE — weekend attendance simulation enabled for testing
+                    only. This is not production attendance.
+                  </p>
+                ) : (
+                  <p className="att-banner att-banner--muted">
+                    Attendance is recorded on working days (Mon–Fri) only.
+                  </p>
+                ))}
 
               <div className="att-actions">
                 <button
                   type="button"
                   className="btn"
-                  disabled={
-                    Boolean(actionBusy) || todayIsWeekend || Boolean(todayRecord?.checkIn)
-                  }
+                  disabled={Boolean(actionBusy) || weekendBlocked || Boolean(todayRecord?.checkIn)}
                   onClick={() => handleCheck('in')}
                 >
                   {actionBusy === 'in' ? 'Checking in…' : 'Check in'}
@@ -192,7 +203,7 @@ export default function AttendancePage() {
                   className="btn btn--secondary"
                   disabled={
                     Boolean(actionBusy) ||
-                    todayIsWeekend ||
+                    weekendBlocked ||
                     !todayRecord?.checkIn ||
                     Boolean(todayRecord?.checkOut)
                   }
@@ -223,6 +234,9 @@ export default function AttendancePage() {
                   <div>
                     <p className="att-row__title">{formatDay(record.date)}</p>
                     <p className="att-row__meta">{formatTimes(record)}</p>
+                    {record.devWeekendTest && (
+                      <p className="att-row__flag att-devtag">Dev test entry (weekend)</p>
+                    )}
                     {record.payrollFinalized && (
                       <p className="att-row__flag">In a finalized payroll run</p>
                     )}

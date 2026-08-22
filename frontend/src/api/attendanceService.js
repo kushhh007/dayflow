@@ -9,6 +9,36 @@ import { mockResponse } from './mock.js'
 // rules: auto-ABSENT generation, reconciliation jobs, and payroll logic stay
 // backend-owned per spec §4–§6.
 
+// DEVELOPMENT / DEMO-ONLY OVERRIDE — weekend attendance simulation.
+// Purpose: let check-in/check-out succeed on Sat/Sun in this MOCK service so
+// demos can be rehearsed on weekends. This is a testing affordance ONLY:
+// - it introduces no production overtime rule and changes no v4.5 semantics;
+// - entries made through it carry `devWeekendTest: true` and are labeled as
+//   test data in the UI — they are not "normal working attendance";
+// - the real API integration must NEVER use this; remove the whole block
+//   once docs/api.md lands.
+// Controlled via localStorage key 'dayflow.dev.weekendAttendanceTest' or env
+// var VITE_ENABLE_WEEKEND_ATTENDANCE_TEST=true.
+const DEV_WEEKEND_KEY = 'dayflow.dev.weekendAttendanceTest'
+
+function devWeekendAttendanceEnabled() {
+  try {
+    if (window.localStorage.getItem(DEV_WEEKEND_KEY) === 'true') return true
+  } catch {
+    // storage unavailable — fall through to env flag
+  }
+  return import.meta.env?.VITE_ENABLE_WEEKEND_ATTENDANCE_TEST === 'true'
+}
+
+export function isDevWeekendAttendanceEnabled() {
+  return devWeekendAttendanceEnabled()
+}
+
+function isWeekend(date) {
+  const weekday = date.getDay()
+  return weekday === 0 || weekday === 6
+}
+
 function isoDate(date = new Date()) {
   const offset = date.getTimezoneOffset()
   return new Date(date.getTime() - offset * 60 * 1000).toISOString().slice(0, 10)
@@ -72,10 +102,11 @@ export async function checkIn() {
   // Contract area: ATTENDANCE — one check-in per working day within the
   // 06:00–22:00 company-local window (spec §5). Backend validates window,
   // working day, and duplicate prevention; these mocks reproduce those
-  // rejections so the UI error paths stay testable.
+  // rejections so the UI error paths stay testable. Weekend rejection is
+  // relaxed ONLY by the dev/demo override below, which labels the record.
   const now = new Date()
-  const weekday = now.getDay()
-  if (weekday === 0 || weekday === 6) {
+  const weekend = isWeekend(now)
+  if (weekend && !devWeekendAttendanceEnabled()) {
     throw new Error('Attendance is recorded on working days (Mon–Fri) only.')
   }
 
@@ -94,6 +125,7 @@ export async function checkIn() {
       checkIn: null,
       checkOut: null,
       payrollFinalized: false,
+      ...(weekend ? { devWeekendTest: true } : {}),
     }
     store.records.push(record)
   }
