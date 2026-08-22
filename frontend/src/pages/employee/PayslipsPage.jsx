@@ -4,6 +4,7 @@ import EmptyState from '../../components/states/EmptyState.jsx'
 import ErrorState from '../../components/states/ErrorState.jsx'
 import PayslipCard from '../../components/ui/PayslipCard.jsx'
 import * as payrollService from '../../api/payrollService.js'
+import '../payslipGrid.css'
 
 // Spec §3: employees see only their own payslips — gross, itemized
 // components/deductions, net. Salary structure and other employees' data are

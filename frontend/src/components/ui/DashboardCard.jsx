@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import './dashboardCard.css'
 
-export default function DashboardCard({ title, to, actionLabel = 'View all', children }) {
+export default function DashboardCard({ title, to, actionLabel = 'View all', className = '', children }) {
   return (
-    <section className="dash-card">
+    <section className={`dash-card${className ? ` ${className}` : ''}`}>
       <header className="dash-card__header">
         <h2>{title}</h2>
         {to && (

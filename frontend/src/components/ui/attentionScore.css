@@ -1,0 +1,18 @@
+.attention-score {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.attention-score__total {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--df-primary-soft);
+  color: var(--df-primary-strong);
+  font-weight: 600;
+}
+
+.attention-score__breakdown {
+  color: var(--df-warning);
+}

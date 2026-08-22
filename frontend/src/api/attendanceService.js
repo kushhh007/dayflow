@@ -89,6 +89,20 @@ const store = {
   corrections: [],
 }
 
+store.corrections.push({
+  id: 'cr-seed',
+  employeeName: 'Demo Employee',
+  date: store.records[0].date,
+  correctedCheckIn: '09:00',
+  correctedCheckOut: '18:00',
+  reason: 'Badge reader was unavailable.',
+  status: 'PENDING',
+  submittedAt: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+  payrollFinalized: true,
+  attentionScore: 15,
+  breakdown: [{ label: 'Payroll/attendance anomaly', points: 15 }],
+})
+
 export async function getMyAttendance() {
   // Contract area: ATTENDANCE — the signed-in employee's records (Mon–Fri
   // only), newest first. Sample shape: [{ id, date: 'YYYY-MM-DD', status,
@@ -155,8 +169,48 @@ export async function checkOut() {
 export async function listCorrectionRequests() {
   // Contract area: ATTENDANCE — correction requests visible to the caller
   // (own history here; Admin queue elsewhere). Newest first.
-  const requests = [...store.corrections].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))
+  const requests = [...store.corrections]
+    .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))
+    .map((request) => ({ ...request }))
   return mockResponse(requests)
+}
+
+export async function listCorrectionQueue() {
+  // Contract area: ATTENDANCE — Admin's pending correction queue. Attention
+  // score and breakdown are backend-provided; this mock returns them in the
+  // order the Admin queue should display.
+  const requests = store.corrections
+    .filter((request) => request.status === 'PENDING')
+    .map((request) => ({
+      ...request,
+      employeeName: request.employeeName ?? 'Demo Employee',
+      attentionScore: request.attentionScore ?? null,
+      breakdown: request.breakdown ?? [],
+    }))
+    .sort((a, b) => (b.attentionScore ?? 0) - (a.attentionScore ?? 0))
+  return mockResponse(requests)
+}
+
+export async function approveCorrectionRequest(requestId) {
+  // Contract area: ATTENDANCE — guarded PENDING → APPROVED transition. The
+  // real approval transaction also applies Attendance, AuditLog, and a
+  // notification atomically; this mock changes only the request state.
+  const request = store.corrections.find((entry) => entry.id === requestId)
+  if (!request || request.status !== 'PENDING') {
+    throw new Error('Only pending correction requests can be approved.')
+  }
+  request.status = 'APPROVED'
+  return mockResponse({ ...request })
+}
+
+export async function rejectCorrectionRequest(requestId) {
+  // Contract area: ATTENDANCE — guarded PENDING → REJECTED transition.
+  const request = store.corrections.find((entry) => entry.id === requestId)
+  if (!request || request.status !== 'PENDING') {
+    throw new Error('Only pending correction requests can be rejected.')
+  }
+  request.status = 'REJECTED'
+  return mockResponse({ ...request })
 }
 
 export async function submitCorrection(payload) {

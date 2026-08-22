@@ -106,7 +106,7 @@ export default function LeaveApprovalsPage() {
                       {item.attachmentName && (
                         <p className="att-row__meta">📎 {item.attachmentName}</p>
                       )}
-                      {item.breakdown.length > 0 && (
+                      {Array.isArray(item.breakdown) && item.breakdown.length > 0 && (
                         <p className="approval-breakdown">
                           {item.breakdown
                             .map((entry) => `+${entry.points} ${entry.label}`)

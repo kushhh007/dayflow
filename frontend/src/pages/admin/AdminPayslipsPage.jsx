@@ -4,6 +4,7 @@ import EmptyState from '../../components/states/EmptyState.jsx'
 import ErrorState from '../../components/states/ErrorState.jsx'
 import PayslipCard from '../../components/ui/PayslipCard.jsx'
 import * as payrollService from '../../api/payrollService.js'
+import '../payslipGrid.css'
 
 // Spec §3/§4: Admin view across all payslips, including the component
 // snapshot stored at finalization. Read-only — no mutation controls exist.

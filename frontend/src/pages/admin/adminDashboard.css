@@ -1,0 +1,80 @@
+.admin-dash__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.admin-dash__wide {
+  grid-column: 1 / -1;
+}
+
+.admin-dash__flag,
+.admin-dash__queue-item {
+  display: grid;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--df-border);
+}
+
+.admin-dash__flag:first-child,
+.admin-dash__queue-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.admin-dash__title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.admin-dash__meta {
+  margin: 0;
+  color: var(--df-text-muted);
+  font-size: 13px;
+}
+
+.admin-dash__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-dash__link {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-dash .att-banner {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fdeceb;
+  color: var(--df-danger);
+  font-size: 13px;
+}
+
+.admin-dash .leave-cancel,
+.correction-row__actions .leave-cancel {
+  border: 1px solid var(--df-border);
+  border-radius: 8px;
+  padding: 7px 11px;
+  background: transparent;
+  color: var(--df-danger);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.admin-dash .leave-cancel:hover:not(:disabled),
+.correction-row__actions .leave-cancel:hover:not(:disabled) {
+  border-color: var(--df-danger);
+}
+
+.admin-dash .leave-cancel:disabled,
+.correction-row__actions .leave-cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
