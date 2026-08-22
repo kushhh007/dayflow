@@ -6,12 +6,32 @@ import { mockResponse } from './mock.js'
 
 export async function listLeaveRequests() {
   // Contract area: LEAVE — requests visible to the caller (own vs Admin queue).
-  return mockResponse([])
+  // Sample shape: [{ id, type: 'PAID'|'SICK'|'UNPAID', startDate, endDate,
+  // days, status }]. Final schema pending docs/api.md.
+  const today = new Date()
+  const shift = (days) => {
+    const date = new Date(today)
+    date.setDate(date.getDate() + days)
+    return date.toISOString().slice(0, 10)
+  }
+  const requests = [
+    { id: 'lr-sample-1', type: 'PAID', startDate: shift(4), endDate: shift(5), days: 2, status: 'PENDING' },
+    { id: 'lr-sample-2', type: 'SICK', startDate: shift(-9), endDate: shift(-9), days: 1, status: 'APPROVED' },
+    { id: 'lr-sample-3', type: 'UNPAID', startDate: shift(-30), endDate: shift(-29), days: 2, status: 'REJECTED' },
+  ]
+  return mockResponse(requests)
 }
 
 export async function getLeaveBalances() {
   // Contract area: LEAVE — Available = Allocated − ApprovedOrUsed per type.
-  return mockResponse([])
+  // `available` is a server-computed value; the frontend only renders it.
+  // Unpaid has no allocation (spec §6), hence null allocated/available.
+  const balances = [
+    { type: 'PAID', allocated: 18, approvedOrUsed: 6, available: 12 },
+    { type: 'SICK', allocated: 12, approvedOrUsed: 2, available: 10 },
+    { type: 'UNPAID', allocated: null, approvedOrUsed: 0, available: null },
+  ]
+  return mockResponse(balances)
 }
 
 export async function applyLeave(payload) {

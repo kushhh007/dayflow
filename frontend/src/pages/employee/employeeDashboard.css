@@ -1,0 +1,174 @@
+.dash__header {
+  margin-bottom: 4px;
+}
+
+.dash__header h1 {
+  font-size: 24px;
+}
+
+.dash__date {
+  margin: 4px 0 0;
+  color: var(--df-text-muted);
+}
+
+.dash__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.dash-list > li {
+  padding: 10px 0;
+  border-top: 1px solid var(--df-border);
+}
+
+.dash-list > li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.dash-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dash-row__title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dash-row__meta {
+  margin: 2px 0 0;
+  color: var(--df-text-muted);
+  font-size: 13px;
+}
+
+.dash-note {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--df-primary-strong);
+}
+
+/* Attendance ---------------------------------------------------------- */
+
+.dash-attendance {
+  display: grid;
+  gap: 14px;
+}
+
+.dash-attendance .badge {
+  justify-self: start;
+  font-size: 13px;
+  padding: 5px 14px;
+}
+
+.dash-attendance__times {
+  display: flex;
+  gap: 28px;
+  margin: 0;
+}
+
+.dash-attendance__times dt {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--df-text-muted);
+}
+
+.dash-attendance__times dd {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Balances ------------------------------------------------------------ */
+
+.dash-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-balance__type {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--df-text-muted);
+}
+
+.dash-balance__value {
+  font-size: 14px;
+}
+
+.dash-balance__meta {
+  color: var(--df-text-muted);
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+/* Payslip -------------------------------------------------------------- */
+
+.dash-payslip__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dash-payslip__net {
+  margin: 6px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* Notifications -------------------------------------------------------- */
+
+.dash-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--df-primary);
+}
+
+/* Quick links ----------------------------------------------------------- */
+
+.dash-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.dash-links a {
+  display: block;
+  padding: 12px 14px;
+  background: var(--df-primary-soft);
+  color: var(--df-primary-strong);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.dash-links a:hover {
+  background: #e2e6fb;
+}

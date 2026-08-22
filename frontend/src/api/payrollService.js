@@ -32,6 +32,15 @@ export async function finalizePayrollRun(runId) {
 
 export async function listPayslips() {
   // Contract area: PAYROLL — own payslips (employee) or all (Admin). Employees
-  // never see the underlying SalaryStructure (spec §3).
-  return mockResponse([])
+  // never see the underlying SalaryStructure (spec §3). Amounts are display-
+  // ready rupees converted by the backend (integer paise is internal, §4).
+  // Sample shape: [{ id, periodLabel, gross, net, status }]. Final schema
+  // pending docs/api.md.
+  const now = new Date()
+  const previous = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const periodLabel = previous.toLocaleString('en-IN', { month: 'long', year: 'numeric' })
+  const payslips = [
+    { id: 'ps-sample-1', periodLabel, gross: 52000, net: 46200, status: 'FINALIZED' },
+  ]
+  return mockResponse(payslips)
 }
