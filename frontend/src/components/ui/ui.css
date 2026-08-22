@@ -1,0 +1,574 @@
+/* Dayflow UI primitives — consumes global --df-* tokens from index.css */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--df-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--df-primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--md {
+  padding: 9px 16px;
+  font-size: 14px;
+}
+
+.btn--sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn--primary {
+  background: var(--df-primary);
+  color: #ffffff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--df-primary-strong);
+}
+
+.btn--secondary {
+  background: var(--df-surface);
+  border-color: var(--df-border);
+  color: var(--df-text);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--df-primary);
+  color: var(--df-primary);
+}
+
+.btn--danger {
+  background: var(--df-danger);
+  color: #ffffff;
+}
+
+.btn--danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--df-text-muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--df-primary-soft);
+  color: var(--df-primary);
+}
+
+.btn__spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: df-spin 600ms linear infinite;
+}
+
+@keyframes df-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--df-surface);
+  border: 1px solid var(--df-border);
+  border-radius: var(--df-radius);
+  box-shadow: var(--df-shadow);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--df-border);
+}
+
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card__body {
+  padding: 20px;
+}
+
+/* ---------- StatCard ---------- */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  background: var(--df-surface);
+  border: 1px solid var(--df-border);
+  border-radius: var(--df-radius);
+  box-shadow: var(--df-shadow);
+}
+
+.stat-card__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+
+.stat-card__value {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--df-text);
+}
+
+.stat-card__hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--df-text-muted);
+}
+
+.stat-card__hint--success {
+  color: var(--df-success);
+}
+
+.stat-card__hint--warning {
+  color: var(--df-warning);
+}
+
+.stat-card__hint--danger {
+  color: var(--df-danger);
+}
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge--success {
+  background: #e7f6ee;
+  color: var(--df-success);
+}
+
+.badge--warning {
+  background: #fdf1e4;
+  color: var(--df-warning);
+}
+
+.badge--danger {
+  background: #fdebe9;
+  color: var(--df-danger);
+}
+
+.badge--info {
+  background: var(--df-primary-soft);
+  color: var(--df-primary);
+}
+
+.badge--neutral {
+  background: #eef0f4;
+  color: var(--df-text-muted);
+}
+
+/* ---------- StatusDot ---------- */
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--df-text);
+  white-space: nowrap;
+}
+
+.status-dot__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot__marker svg {
+  width: 15px;
+  height: 15px;
+}
+
+.status-dot--present .status-dot__marker {
+  background: #12b76a;
+  box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.18);
+}
+
+.status-dot--absent .status-dot__marker {
+  background: #f79009;
+  box-shadow: 0 0 0 3px rgba(247, 144, 9, 0.18);
+}
+
+.status-dot--leave {
+  color: var(--df-primary);
+}
+
+.status-dot--off .status-dot__marker {
+  background: #98a2b3;
+  box-shadow: 0 0 0 3px rgba(152, 162, 179, 0.18);
+}
+
+/* ---------- Avatar ---------- */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--df-primary-soft);
+  color: var(--df-primary);
+  font-weight: 700;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar--sm {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.avatar--md {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+
+.avatar--lg {
+  width: 56px;
+  height: 56px;
+  font-size: 19px;
+}
+
+/* ---------- Form fields ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--df-text);
+}
+
+.field__required {
+  color: var(--df-danger);
+  margin-left: 2px;
+}
+
+.field__control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--df-border);
+  border-radius: 8px;
+  background: var(--df-surface);
+  color: var(--df-text);
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.field__control:focus {
+  outline: none;
+  border-color: var(--df-primary);
+  box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.14);
+}
+
+.field__control:disabled {
+  background: #f2f4f8;
+  cursor: not-allowed;
+}
+
+textarea.field__control {
+  resize: vertical;
+  min-height: 72px;
+}
+
+select.field__control {
+  appearance: auto;
+}
+
+.field--error .field__control {
+  border-color: var(--df-danger);
+}
+
+.field--error .field__control:focus {
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.14);
+}
+
+.field__error {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--df-danger);
+}
+
+.field__hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--df-text-muted);
+}
+
+.field__file-name {
+  font-size: 12.5px;
+  color: var(--df-text-muted);
+}
+
+/* ---------- DataTable ---------- */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  background: #fafbfe;
+  border-bottom: 1px solid var(--df-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--df-border);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: #fafbff;
+}
+
+.table td.is-numeric,
+.table th.is-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table--clickable tbody tr {
+  cursor: pointer;
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(23, 29, 46, 0.55);
+  animation: df-fade-in 140ms ease;
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--df-surface);
+  border-radius: var(--df-radius);
+  box-shadow: 0 20px 50px rgba(16, 24, 40, 0.28);
+  animation: df-pop-in 160ms ease;
+}
+
+.modal--wide {
+  max-width: 640px;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--df-border);
+}
+
+.modal__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--df-text-muted);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal__close:hover {
+  background: var(--df-primary-soft);
+  color: var(--df-primary);
+}
+
+.modal__body {
+  padding: 20px;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--df-border);
+}
+
+@keyframes df-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes df-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--df-border);
+  overflow-x: auto;
+}
+
+.tabs__tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 14px;
+  margin-bottom: -1px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--df-text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.tabs__tab:hover {
+  color: var(--df-text);
+}
+
+.tabs__tab:focus-visible {
+  outline: 2px solid var(--df-primary);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.tabs__tab[aria-selected='true'] {
+  color: var(--df-primary);
+  border-bottom-color: var(--df-primary);
+  font-weight: 600;
+}
+
+/* ---------- Skeleton ---------- */
+.skeleton {
+  position: relative;
+  display: block;
+  border-radius: 6px;
+  background: #e8eaf1;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: df-shimmer 1.4s ease infinite;
+}
+
+@keyframes df-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn__spinner,
+  .skeleton::after,
+  .modal-overlay,
+  .modal {
+    animation: none;
+  }
+}
