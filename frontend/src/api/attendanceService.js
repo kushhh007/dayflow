@@ -1,4 +1,4 @@
-import { mockResponse } from './mock.js'
+import { mockResponse, DEMO_ATTENDANCE_WEEK } from './mock.js'
 
 // MOCK SERVICE. Contract areas follow the Dayflow v4.5 spec; endpoint paths
 // will be defined in docs/api.md by the backend lead and must not be invented
@@ -6,7 +6,7 @@ import { mockResponse } from './mock.js'
 
 export async function getMyAttendance() {
   // Contract area: ATTENDANCE — the signed-in employee's records (Mon–Fri only).
-  return mockResponse([])
+  return mockResponse(DEMO_ATTENDANCE_WEEK)
 }
 
 export async function checkIn() {

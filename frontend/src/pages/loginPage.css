@@ -8,10 +8,9 @@
 .login__card {
   width: min(420px, 100%);
   background: var(--df-surface);
-  border: 1px solid var(--df-border);
-  border-radius: 14px;
-  box-shadow: var(--df-shadow);
-  padding: 36px 32px;
+  border: 1px solid var(--df-border-soft);
+  border-radius: var(--df-radius-lg);
+  padding: 40px 32px;
   display: grid;
   gap: 12px;
   justify-items: center;
@@ -24,11 +23,17 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--df-radius-sm);
   background: var(--df-primary);
-  color: #ffffff;
+  color: var(--df-on-accent);
   font-size: 22px;
   font-weight: 700;
+}
+
+.login__card h1 {
+  font-size: 34px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .login__subtitle {

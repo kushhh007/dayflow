@@ -1,0 +1,125 @@
+.dash__greeting h1 {
+  font-size: clamp(28px, 4vw, 44px);
+}
+
+.dash__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dash__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dash__span-2 {
+  grid-column: span 2;
+}
+
+.dash__balances {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.dash__balances li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--df-border-soft);
+  font-size: 14px;
+}
+
+.dash__balances li:last-child {
+  border-bottom: none;
+}
+
+.dash__balances strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--df-primary);
+}
+
+.dash__balances em {
+  font-style: normal;
+  color: var(--df-text-muted);
+}
+
+.dash__more-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--df-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--df-border);
+  padding-bottom: 2px;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
+}
+
+.card__header .dash__more-link,
+.card__actions .dash__more-link {
+  margin-top: 0;
+}
+
+.dash__more-link:hover {
+  color: var(--df-primary);
+  border-color: var(--df-primary);
+}
+
+.dash__payslip {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dash__payslip div {
+  display: grid;
+  gap: 4px;
+}
+
+.dash__payslip dt {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--df-text-muted);
+}
+
+.dash__payslip dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1024px) {
+  .dash__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash__span-2 {
+    grid-column: auto;
+  }
+
+  .dash__payslip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .dash__stats {
+    grid-template-columns: 1fr;
+  }
+}

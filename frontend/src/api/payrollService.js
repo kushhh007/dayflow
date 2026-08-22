@@ -1,4 +1,4 @@
-import { mockResponse } from './mock.js'
+import { mockResponse, DEMO_PAYSLIPS } from './mock.js'
 
 // MOCK SERVICE. Contract areas follow the Dayflow v4.5 spec; endpoint paths
 // will be defined in docs/api.md by the backend lead and must not be invented
@@ -33,5 +33,5 @@ export async function finalizePayrollRun(runId) {
 export async function listPayslips() {
   // Contract area: PAYROLL — own payslips (employee) or all (Admin). Employees
   // never see the underlying SalaryStructure (spec §3).
-  return mockResponse([])
+  return mockResponse(DEMO_PAYSLIPS)
 }

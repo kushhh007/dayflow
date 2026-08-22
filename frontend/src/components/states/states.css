@@ -10,9 +10,9 @@
 }
 
 .state--card {
-  background: var(--df-surface);
+  background: transparent;
   border: 1px dashed var(--df-border);
-  border-radius: var(--df-radius);
+  border-radius: var(--df-radius-lg);
 }
 
 .state--inline {
@@ -23,7 +23,7 @@
 .state__spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid var(--df-primary-soft);
+  border: 3px solid rgba(254, 251, 246, 0.12);
   border-top-color: var(--df-primary);
   border-radius: 50%;
   animation: state-spin 0.7s linear infinite;
@@ -47,12 +47,12 @@
 .state__icon {
   width: 36px;
   height: 36px;
-  color: #98a2b3;
+  color: var(--df-text-faint);
 }
 
 .state__title {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--df-text);
 }
 
@@ -64,19 +64,4 @@
   margin: 0;
   max-width: 46ch;
   font-size: 14px;
-}
-
-.btn {
-  display: inline-block;
-  border: 0;
-  border-radius: 8px;
-  padding: 9px 16px;
-  background: var(--df-primary);
-  color: #ffffff;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn:hover {
-  background: var(--df-primary-strong);
 }

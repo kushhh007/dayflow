@@ -1,6 +1,6 @@
 import './ui.css'
 
-const TONES = ['success', 'warning', 'danger', 'info', 'neutral']
+const TONES = ['success', 'warning', 'danger', 'info', 'neutral', 'accent']
 
 /**
  * Pill label. tone: 'success' | 'warning' | 'danger' | 'info' | 'neutral'

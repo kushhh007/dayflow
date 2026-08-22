@@ -1,4 +1,4 @@
-import { mockResponse } from './mock.js'
+import { mockResponse, DEMO_NOTIFICATIONS } from './mock.js'
 
 // MOCK SERVICE. Contract areas follow the Dayflow v4.5 spec; endpoint paths
 // will be defined in docs/api.md by the backend lead and must not be invented
@@ -7,7 +7,7 @@ import { mockResponse } from './mock.js'
 export async function listNotifications() {
   // Contract area: NOTIFICATIONS — in-app only: leave approved/rejected,
   // attendance anomaly, payroll ready for review (spec §9).
-  return mockResponse([])
+  return mockResponse(DEMO_NOTIFICATIONS)
 }
 
 export async function markNotificationRead(notificationId) {

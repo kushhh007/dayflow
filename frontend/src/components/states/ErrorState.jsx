@@ -1,3 +1,4 @@
+import Button from '../ui/Button.jsx'
 import './states.css'
 
 export default function ErrorState({ title = 'Something went wrong', message, onRetry }) {
@@ -6,9 +7,7 @@ export default function ErrorState({ title = 'Something went wrong', message, on
       <p className="state__title">{title}</p>
       {message && <p className="state__message">{message}</p>}
       {onRetry && (
-        <button type="button" className="btn" onClick={onRetry}>
-          Try again
-        </button>
+        <Button onClick={onRetry}>Try again</Button>
       )}
     </div>
   )

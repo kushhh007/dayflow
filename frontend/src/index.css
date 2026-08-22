@@ -1,19 +1,47 @@
+/* Dayflow design system — dark editorial theme.
+   Token names stay --df-* so existing components keep working. */
+
 :root {
-  --df-bg: #f4f5fb;
-  --df-surface: #ffffff;
-  --df-border: #e3e6ef;
-  --df-text: #1c2333;
-  --df-text-muted: #5c6577;
-  --df-primary: #4338ca;
-  --df-primary-strong: #372fae;
-  --df-primary-soft: #eef0fd;
-  --df-danger: #b42318;
-  --df-success: #067647;
-  --df-warning: #b54708;
-  --df-sidebar-bg: #171d2e;
-  --df-sidebar-text: #aab1c5;
-  --df-radius: 10px;
-  --df-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  /* Surfaces */
+  --df-bg: #1a1a1a; /* primary black — page background */
+  --df-surface: #252324; /* dark grey — cards, panels */
+  --df-surface-raised: #2d2b2c;
+  --df-sidebar-bg: #000000; /* pure black rail */
+  --df-sidebar-text: #929191;
+
+  /* Text */
+  --df-text: #fefbf6; /* warm off-white */
+  --df-text-muted: #929191; /* grey-450 */
+  --df-text-faint: #7a7772; /* grey-550 */
+
+  /* Accent (primary yellow) */
+  --df-primary: #ffec88;
+  --df-primary-strong: #fffce0; /* paper yellow */
+  --df-primary-soft: rgba(255, 236, 136, 0.12);
+  --df-on-accent: #1a1a1a; /* text on yellow */
+
+  /* Strokes (white alpha, like the reference system) */
+  --df-border: rgba(254, 251, 246, 0.14);
+  --df-border-soft: rgba(254, 251, 246, 0.08);
+
+  /* Status colors tuned for dark surfaces */
+  --df-danger: #ff8a7a;
+  --df-danger-soft: rgba(255, 138, 122, 0.14);
+  --df-success: #7ee2a8;
+  --df-success-soft: rgba(126, 226, 168, 0.14);
+  --df-warning: #ffc46b;
+  --df-warning-soft: rgba(255, 196, 107, 0.14);
+  --df-info: #b3c7ff;
+
+  /* Focus ring */
+  --df-focus: #4d65ff;
+
+  /* Shape + motion */
+  --df-radius-sm: 4px;
+  --df-radius: 8px;
+  --df-radius-lg: 16px;
+  --df-shadow: none;
+  --df-ease: cubic-bezier(0.21, 1, 0.34, 1);
 }
 
 * {
@@ -26,9 +54,14 @@ body {
   padding: 0;
 }
 
+html {
+  scrollbar-color: var(--df-primary) var(--df-bg);
+  scrollbar-width: thin;
+}
+
 body {
   font-family:
-    'Inter',
+    'Instrument Sans',
     system-ui,
     -apple-system,
     'Segoe UI',
@@ -36,9 +69,29 @@ body {
     sans-serif;
   font-size: 15px;
   line-height: 1.5;
+  letter-spacing: -0.01em;
   color: var(--df-text);
   background: var(--df-bg);
   -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--df-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--df-primary);
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--df-primary);
+  color: var(--df-on-accent);
 }
 
 h1,
@@ -46,12 +99,20 @@ h2,
 h3 {
   color: var(--df-text);
   margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-weight: 500;
 }
 
 a {
-  color: var(--df-primary);
+  color: var(--df-info);
 }
 
 button {
   font: inherit;
+}
+
+:focus-visible {
+  outline: 0.125rem solid var(--df-focus);
+  outline-offset: 0.125rem;
 }
