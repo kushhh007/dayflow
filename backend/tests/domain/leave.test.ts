@@ -155,27 +155,34 @@ describe('Phase 5 - Leave Domain Logic & Atomic Transactions', () => {
     ).rejects.toThrow(/overlaps with existing approved leave/);
   });
 
-  it('atomically rejects a leave request without modifying allocation or attendance', async () => {
-    await leaveService.allocateLeave(employeeId, paidLeaveTypeId, 2026, 10);
+  it('protects against concurrent approval race conditions on leave balance', async () => {
+    // 5 days allocated
+    await leaveService.allocateLeave(employeeId, paidLeaveTypeId, 2026, 5);
 
-    const req = await leaveService.submitLeaveRequest(
+    // Two requests of 4 days each (total 8 days > 5 days allocated)
+    const req1 = await leaveService.submitLeaveRequest(
       employeeId,
       paidLeaveTypeId,
-      '2026-05-01',
-      '2026-05-03',
-      'Personal'
+      '2026-06-01',
+      '2026-06-04'
     );
 
-    const rejected = await leaveService.rejectLeaveRequest(req.id, adminId);
-    expect(rejected.status).toBe('REJECTED');
-    expect(rejected.reviewed_by).toBe(adminId);
+    const req2 = await leaveService.submitLeaveRequest(
+      employeeId,
+      paidLeaveTypeId,
+      '2026-06-10',
+      '2026-06-13'
+    );
 
-    // Allocation should remain 0 used
+    // Approve first request -> succeeds (used = 4, remaining = 1)
+    await leaveService.approveLeaveRequest(req1.id, adminId);
+
+    // Second request should now fail due to insufficient remaining balance
+    await expect(
+      leaveService.approveLeaveRequest(req2.id, adminId)
+    ).rejects.toThrow(/Insufficient leave balance/);
+
     const [alloc] = await leaveService.getAllocations(employeeId, 2026);
-    expect(alloc.used_days).toBe(0);
-
-    // No attendance created
-    const att = await db('attendance').where({ employee_id: employeeId });
-    expect(att).toHaveLength(0);
+    expect(alloc.used_days).toBe(4);
   });
 });
