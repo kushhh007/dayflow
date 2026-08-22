@@ -1,0 +1,54 @@
+.att__grid--single {
+  grid-template-columns: 1fr;
+}
+
+.approval-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.approval-row__main {
+  min-width: 0;
+}
+
+.approval-row__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.approval-score {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--df-primary-soft);
+  color: var(--df-primary-strong);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.approval-breakdown {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--df-warning);
+}
+
+.approval-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .approval-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .approval-row__actions {
+    justify-content: flex-end;
+  }
+}
