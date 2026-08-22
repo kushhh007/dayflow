@@ -38,19 +38,30 @@ export async function balances(viewer: AuthedUser, employeeIdParam?: string, yea
   }
 
   const targetYear = year ?? new Date().getUTCFullYear();
-  const allocations = await prisma.leaveAllocation.findMany({
-    where: { employeeId, year: targetYear },
-    include: { type: { select: { code: true } } }
-  });
+  const [types, allocations] = await Promise.all([
+    prisma.leaveType.findMany({ orderBy: { code: 'asc' } }),
+    prisma.leaveAllocation.findMany({
+      where: { employeeId, year: targetYear },
+      include: { type: { select: { code: true } } }
+    })
+  ]);
+
+  const allocationByCode = new Map(allocations.map((a) => [a.type.code, a]));
 
   return {
-    balances: allocations.map((a) => ({
-      type: a.type.code,
-      year: a.year,
-      allocatedDays: Number(a.allocatedDays),
-      approvedOrUsedDays: Number(a.approvedOrUsedDays),
-      availableDays: Number(a.allocatedDays) - Number(a.approvedOrUsedDays)
-    }))
+    year: targetYear,
+    balances: types.map((t) => {
+      const allocation = allocationByCode.get(t.code);
+      return {
+        type: t.code,
+        requiresAllocation: t.requiresAllocation,
+        allocatedDays: allocation ? Number(allocation.allocatedDays) : null,
+        approvedOrUsedDays: allocation ? Number(allocation.approvedOrUsedDays) : 0,
+        availableDays: allocation
+          ? Number(allocation.allocatedDays) - Number(allocation.approvedOrUsedDays)
+          : null
+      };
+    })
   };
 }
 

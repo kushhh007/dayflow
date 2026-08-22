@@ -143,8 +143,18 @@ Response 200 `{ "types": [{ "code": "PAID|SICK|UNPAID", "requiresAllocation", "r
 
 ### GET /api/leave/balances — ADMIN, EMPLOYEE
 EMPLOYEE: own. ADMIN: `?employeeId=&year=`
-`Available = Allocated − ApprovedOrUsed` (Unpaid has no allocation).
-Response 200 `{ "balances": [{ "type": "PAID", "year", "allocatedDays", "approvedOrUsedDays", "availableDays" }] }`
+`Available = Allocated − ApprovedOrUsed` (Unpaid has no allocation → `allocatedDays`/`availableDays` are `null`).
+Response 200:
+```json
+{
+  "year": 2026,
+  "balances": [
+    { "type": "PAID",   "requiresAllocation": true,  "allocatedDays": 18,   "approvedOrUsedDays": 6, "availableDays": 12 },
+    { "type": "SICK",   "requiresAllocation": true,  "allocatedDays": 12,   "approvedOrUsedDays": 2, "availableDays": 10 },
+    { "type": "UNPAID", "requiresAllocation": false, "allocatedDays": null, "approvedOrUsedDays": 0, "availableDays": null }
+  ]
+}
+```
 
 ### POST /api/leave/requests — ADMIN, EMPLOYEE (self)
 Full-day requests only. Leave year = calendar year; **cross-year requests rejected**. Weekends count toward leave days.
@@ -205,7 +215,22 @@ Errors: `409` not CALCULATED / concurrent recalculation / finalized overlap
 
 ### GET /api/payslips — ADMIN, EMPLOYEE
 EMPLOYEE: own only. ADMIN: `?runId=&employeeId=`
-Response 200 `{ "payslips": [...], "meta" }`
+Response 200 (item shape — **all amounts integer paise; convert to ₹ only at display**; `periodStart`/`periodEnd` come from the parent run for label rendering):
+```json
+{
+  "payslips": [
+    {
+      "id": "…", "payrollRunId": "…", "employeeId": "…",
+      "periodStart": "2026-07-01", "periodEnd": "2026-07-31",
+      "workingDays": 23, "payableDays": 21,
+      "grossPaise": 4890000, "employeePfPaise": 293400, "professionalTaxPaise": 20000, "netPaise": 4576600,
+      "finalized": true, "createdAt": "2026-08-01T04:30:00.000Z"
+    }
+  ],
+  "meta": { "total": 1, "limit": 20, "offset": 0 }
+}
+```
+ADMIN responses additionally include the component snapshot: `employerPfPaise, basicPaise, hraPaise, standardAllowancePaise, performanceBonusPaise, ltaPaise, fixedAllowancePaise`.
 
 ### GET /api/payslips/:id — owner or ADMIN
 Field visibility (spec §3):

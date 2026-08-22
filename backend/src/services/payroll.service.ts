@@ -318,11 +318,16 @@ export async function finalizeRun(runId: string, viewer: AuthedUser) {
   });
 }
 
-function projectPayslip(payslip: Prisma.PayslipGetPayload<object>, role: 'ADMIN' | 'EMPLOYEE') {
+function projectPayslip(
+  payslip: Prisma.PayslipGetPayload<{ include: { run: { select: { periodStart: true, periodEnd: true } } } }>,
+  role: 'ADMIN' | 'EMPLOYEE'
+) {
   const base = {
     id: payslip.id,
     payrollRunId: payslip.payrollRunId,
     employeeId: payslip.employeeId,
+    periodStart: payslip.run.periodStart,
+    periodEnd: payslip.run.periodEnd,
     workingDays: payslip.workingDays,
     payableDays: Number(payslip.payableDays),
     grossPaise: payslip.grossPaise,
@@ -367,7 +372,8 @@ export async function listPayslips(viewer: AuthedUser, query: {
       where,
       orderBy: { createdAt: 'desc' },
       take: query.limit,
-      skip: query.offset
+      skip: query.offset,
+      include: { run: { select: { periodStart: true, periodEnd: true } } }
     })
   ]);
 
@@ -378,7 +384,10 @@ export async function listPayslips(viewer: AuthedUser, query: {
 }
 
 export async function getPayslip(id: string, viewer: AuthedUser) {
-  const payslip = await prisma.payslip.findUnique({ where: { id } });
+  const payslip = await prisma.payslip.findUnique({
+    where: { id },
+    include: { run: { select: { periodStart: true, periodEnd: true } } }
+  });
   if (!payslip) throw new HttpError(404, 'Payslip not found');
 
   if (viewer.role === 'EMPLOYEE') {
